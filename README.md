@@ -1,8 +1,6 @@
 # CloudService
 
-· Language(s): Front end is React
-
-	             Backend is Python 
+· Language(s): Front end is React + Backend is Python 
 		     
 · Frameworks: Flask
 

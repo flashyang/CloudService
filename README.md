@@ -52,4 +52,6 @@ git add -A
 
 git commit -m "something"
 
+git push -u 或者
+
 git push -u origin master

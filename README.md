@@ -40,6 +40,8 @@ flask init-db
 
 git clone https://github.com/flashyang/CloudService.git
 
+cd CloudService
+
 git add -A
 
 git commit -m "something"

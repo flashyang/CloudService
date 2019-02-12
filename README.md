@@ -20,6 +20,8 @@
 
 
 # Command Line for running:
+Flask activate the vitual environment:
+. venv/bin/activate
 
 pip install -e .
 

@@ -21,6 +21,8 @@
 
 # Command Line for running:
 
+pip install -e .
+
 (outside of the flaskr folder)
 
 export FLASK_APP=flaskr

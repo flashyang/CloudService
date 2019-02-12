@@ -38,7 +38,14 @@ export FLASK_ENV=development
 flask init-db
 
 
+# Add gitignore
+terminal在根目录下
 
+touch .gitignore
+
+打开.gitignore输入*.pyc
+
+如果已经出现了pyc，就在terminal根目录下输入find . -name "*.pyc" -exec git rm -f "{}" \;
 
 
 

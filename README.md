@@ -19,7 +19,7 @@
 
 
 
-Command Line for running:
+# Command Line for running:
 
 (outside of the flaskr folder)
 
@@ -36,7 +36,7 @@ flask init-db
 
 
 
-Github clone and push:
+# Github clone and push:
 
 git clone https://github.com/flashyang/CloudService.git
 

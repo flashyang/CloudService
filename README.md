@@ -17,6 +17,8 @@
 
 
 
+
+
 Command Line for running:
 
 (outside of the flaskr folder)
@@ -28,6 +30,10 @@ export FLASK_ENV=development
 flask run
 
 flask init-db
+
+
+
+
 
 
 Github clone and push:

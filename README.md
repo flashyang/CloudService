@@ -25,19 +25,17 @@ Flask activate the vitual environment:
 
 pip install -e .
 
-(outside of the flaskr folder)
+(outside of the project folder)
 
-export FLASK_APP=flaskr
-
-export FLASK_ENV=development
-
-flask run
-
-export FLASK_APP=flaskr
+export FLASK_APP=groupnest
 
 export FLASK_ENV=development
 
 flask init-db
+
+flask run
+
+
 
 
 # Add gitignore

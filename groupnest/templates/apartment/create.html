@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Create new Apartment{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+  <form method="Apartment">
+    <label for="title">Title</label>
+    <input name="title" id="title" value="{{ request.form['name'] }}" required>
+    <label for="body">Details</label>
+    <input name="room number" id="title" value="{{ request.form['room_number'] }}">
+      <input name="room number" id="title" value="{{ request.form['room_number'] }}">
+      <input name="bathroom_number" id="title" value="{{ request.form['bathroom_number'] }}">
+      <input name="street_address" id="title" value="{{ request.form['street_address'] }}">
+      <input name="city" id="title" value="{{ request.form['city'] }}">
+      <input name="state" id="title" value="{{ request.form['state'] }}">
+      <input name="zip" id="title" value="{{ request.form['zip'] }}">
+      <input name="price" id="title" value="{{ request.form['price'] }}">
+      <input name="sqft" id="title" value="{{ request.form['sqft'] }}">
+      <input name="photo_URL" id="title" value="{{ request.form['photo_URL'] }}">
+
+      <textarea name="body" id="body">{{ request.form['description'] }}</textarea>
+    <input type="submit" value="Save">
+  </form>
+{% endblock %}

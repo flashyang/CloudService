@@ -14,5 +14,5 @@ def index():
     aprtments = db.execute(
         'SELECT top(10)*'
         'FROM db'
-        'ORDER BY apartment_id DESC'
+        'ORDER BY created DESC'
     ).fetchall()

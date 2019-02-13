@@ -1,0 +1,4 @@
+include groupnest/schema.sql
+graft groupnest/static
+graft groupnest/templates
+global-exclude *.pyc

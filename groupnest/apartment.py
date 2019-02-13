@@ -13,7 +13,7 @@ bp = Blueprint('apartment', __name__, url_prefix='/apartment')
 @bp.route('/')
 def index():
     db = get_db()
-    aprtments = db.execute(
+    apartments = db.execute(
         'SELECT top(10)*'
         'FROM db'
         'ORDER BY created DESC'
@@ -24,16 +24,16 @@ def index():
 @bp.route('/<int:zipcode>/search', methods=('GET',))
 def search(zipcode):
     db = get_db()
-    aprtments = db.execute(
+    apartments = db.execute(
         'SELECT *'
         'FROM apartment'
         'ORDER BY created DESC'
         'WHERE zip = ?',
         (zipcode,)
     ).fetchall()
-    if aprtments is None:
-        abort(Response("No such apartment matching given zipcode exists in our databse. Sorry! :("))
-    return aprtments
+    if apartments is None:
+        abort("No such apartment matching given zipcode exists in our databse. Sorry! :(")
+    return apartments
 
 # Get a apartment by apartmentId
 def get_apartment(apartmentId):
@@ -44,7 +44,7 @@ def get_apartment(apartmentId):
         (apartmentId,)
     ).fetchone()
 
-    if post is None:
+    if aprtment is None:
         abort(404, "Apartment id {0} doesn't exist.".format(apartmentId))
 
     return aprtment

@@ -14,6 +14,12 @@ def register():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
+        first_name = request.form['first_name']
+        last_name = request.form['last_name']
+        email = request.form['email']
+        gender = request.form['gender'].upper()
+        description = request.form['description']
+
         db = get_db()
         error = None
 
@@ -22,17 +28,20 @@ def register():
         elif not password:
             error = 'Password is required.'
         elif db.execute(
-            'SELECT id FROM user WHERE username = ?', (username,)
+            'SELECT user_id FROM user WHERE username = ?', (username,)
         ).fetchone() is not None:
             error = 'User {} is already registered.'.format(username)
 
         if error is None:
-            db.execute(
-                'INSERT INTO user (username, password) VALUES (?, ?)',
-                (username, generate_password_hash(password))
-            )
-            db.commit()
-            return redirect(url_for('auth.login'))
+            try:
+                db.execute(
+                    'INSERT INTO user (username, password, first_name, last_name, email, gender, description) VALUES (?, ?, ?, ?, ?, ?, ?)',
+                    (username, generate_password_hash(password), first_name, last_name, email, gender, description)
+                )
+                db.commit()
+                return redirect(url_for('auth.login'))
+            except:
+                error = 'Gender should be male, female or other.'
 
         flash(error)
 
@@ -76,7 +85,7 @@ def load_logged_in_user():
         g.user = None
     else:
         g.user = get_db().execute(
-            'SELECT * FROM user WHERE id = ?', (user_id,)
+            'SELECT * FROM user WHERE user_id = ?', (user_id,)
         ).fetchone()
 
 def login_required(view):

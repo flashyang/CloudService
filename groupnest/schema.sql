@@ -1,7 +1,7 @@
-DROP TABLE IF EXISTS Reservation;
-DROP TABLE IF EXISTS Nest;
-DROP TABLE IF EXISTS Apartment;
-DROP TABLE IF EXISTS User;
+DROP TABLE IF EXISTS reservation;
+DROP TABLE IF EXISTS nest;
+DROP TABLE IF EXISTS apartment;
+DROP TABLE IF EXISTS user;
 
 CREATE TABLE user (
 user_id	INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -10,7 +10,7 @@ password TEXT NOT NULL,
 first_name TEXT,
 last_name TEXT,
 email TEXT,
-gender TEXT CHECK( gender IN ('Male', 'Female', 'Unknown')),
+gender TEXT CHECK( gender IN ('MALE', 'FEMALE', 'OTHER')),
 description TEXT
 );
 
@@ -45,7 +45,7 @@ reservation_id INTEGER PRIMARY KEY AUTOINCREMENT,
 nest_id INTEGER NOT NULL,
 tenant_id INTEGER NOT NULL,
 created TIMESTAMP NOT NULL, 
-cancelled TINYINT(1) NOT NULL, 
+cancelled INTEGER NOT NULL, 
 FOREIGN KEY (nest_id) REFERENCES nest (nest_id),
 FOREIGN KEY (tenant_id) REFERENCES user (user_id)
 );

@@ -10,4 +10,9 @@ bp = Blueprint('apartment', __name__, url_prefix='/apartment')
 
 @bp.route('/')
 def index():
-    return 'Hello, apartment!'
+    db = get_db()
+    aprtments = db.execute(
+        'SELECT top(10)*'
+        'FROM db'
+        'ORDER BY apartment_id DESC'
+    ).fetchall()

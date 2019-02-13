@@ -21,16 +21,79 @@ def index():
 
 #GET: /apartment/<int: zipcode>/search (zipcode)
 #Get a list of apartments by searching zipcode
-@bp.route('/<int:id>/search', methods=('GET',))
+@bp.route('/<int:zipcode>/search', methods=('GET',))
 def search(zipcode):
     db = get_db()
     aprtments = db.execute(
         'SELECT *'
-        'FROM db'
+        'FROM apartment'
         'ORDER BY created DESC'
         'WHERE zip = ?',
         (zipcode,)
     ).fetchall()
     if aprtments is None:
-        abort(Response("No such zipcode exists in our databse. Sorry! :("))
+        abort(Response("No such apartment matching given zipcode exists in our databse. Sorry! :("))
     return aprtments
+
+# Get a apartment by apartmentId
+def get_apartment(apartmentId):
+    aprtment = get_db().execute(
+        'SELECT *'
+        'FROM apartment'
+        'WHERE apartment_id = ?',
+        (apartmentId,)
+    ).fetchone()
+
+    if post is None:
+        abort(404, "Apartment id {0} doesn't exist.".format(apartmentId))
+
+    return aprtment
+
+#DELETE: /apartment/<int: apartmentId>/delete
+@bp.route('/<int:apartmentId>/delete', methods=('POST',))
+@login_required
+def delete(apartmentId):
+    get_apartment(apartmentId)
+    db = get_db()
+    db.execute('DELETE FROM apartment WHERE apartment_id = ?', (apartmentId,))
+    db.commit()
+    return redirect(url_for('apartment.index'))
+
+
+#PUT:  /apartment/<int: apartmentId>/update
+#Update the apartment by given apartmentId
+@bp.route('/<int:apartmentId>/update', methods=('POST',))
+@login_required
+def update(apartmentId):
+    aprtment = get_apartment(apartmentId)
+
+    if request.method == 'POST':
+        name = request.form['name']
+        room_number = request.form['room_number']
+        bathroom_number = request.form['bathroom_number']
+        street_address = request.form['street_address']
+        city = request.form['city']
+        state = request.form['state']
+        zip = request.form['zip']
+        price = request.form['price']
+        sqft = request.form['sqft']
+        description = request.form['description']
+        photo_URL = request.form['photo_URL']
+        error = None
+
+        if not name:
+            error = 'Name is required.'
+
+        if error is not None:
+            flash(error)
+        else:
+            db = get_db()
+            db.execute(
+                'UPDATE apartment SET name = ?, room_number = ?, bathroom_number = ? , street_address = ?,  city = ?, state = ?, zip = ?, price = ?, sqtf = ?, description = ?, photo_URL = ?'
+                ' WHERE apartment_id = ?',
+                (name, room_number, bathroom_number, street_address, city, state, zip, price, sqft, description, photo_URL, apartmentId)
+            )
+            db.commit()
+            return redirect(url_for('apartment.index'))
+
+    return render_template('apartment/update.html', aprtment=aprtment)

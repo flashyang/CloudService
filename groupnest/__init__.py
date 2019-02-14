@@ -32,6 +32,7 @@ def create_app(test_config=None):
 
     from . import apartment
     app.register_blueprint(apartment.bp)
+    app.add_url_rule('/', endpoint='index', view_func=apartment.index)
 
     from . import nest
     app.register_blueprint(nest.bp)

@@ -14,9 +14,9 @@ def index():
     db = get_db()
     apartments = db.execute(
         'SELECT *'
-        'FROM db'
-        'ORDER BY created DESC'
-        'LIMIT 10'
+        ' FROM apartment'
+        # ' ORDER BY created DESC'
+        # ' LIMIT 10'
     ).fetchall()
     return render_template('apartment/index.html', apartments=apartments)
 
@@ -27,9 +27,9 @@ def search(zipcode):
     db = get_db()
     apartments = db.execute(
         'SELECT *'
-        'FROM apartment'
-        'ORDER BY created DESC'
-        'WHERE zip = ?',
+        ' FROM apartment'
+        ' ORDER BY created DESC'
+        ' WHERE zip = ?',
         (zipcode,)
     ).fetchall()
     if apartments is None:
@@ -40,8 +40,8 @@ def search(zipcode):
 def get_apartment(apartmentId):
     apartment = get_db().execute(
         'SELECT *'
-        'FROM apartment'
-        'WHERE apartment_id = ?',
+        ' FROM apartment'
+        ' WHERE apartment_id = ?',
         (apartmentId,)
     ).fetchone()
 
@@ -66,7 +66,7 @@ def delete(apartmentId):
 @bp.route('/<int:apartmentId>/update', methods=('POST',))
 @login_required
 def update(apartmentId):
-    aprtment = get_apartment(apartmentId)
+    apartment = get_apartment(apartmentId)
 
     if request.method == 'POST':
         name = request.form['name']
@@ -97,7 +97,7 @@ def update(apartmentId):
             db.commit()
             return redirect(url_for('apartment.index'))
 
-    return render_template('apartment/update.html', aprtment=aprtment)
+    return render_template('apartment/update.html', apartment=apartment)
 
 
 @bp.route('/create', methods=('GET', 'POST'))
@@ -122,7 +122,6 @@ def create():
             error = 'title is required.'
         if not room_number:
             error = 'room number is required.'
-
         if not bathroom_number:
             error = 'bathroom number is required.'
         if not street_address:
@@ -145,8 +144,9 @@ def create():
             db.execute(
                 'INSERT INTO apartment (room_number, bathroom_number, street_address, city,state,zip'
                 ',price,sqft,name,description,landlord_id, photo_URL)'
-                ' VALUES (?, ?, ?,?,?, ?, ?,?,?,?)',
-                (room_number, bathroom_number, street_address,city,state, zip,price,sqft,name,description, g.user['user_id'],photo_URL)
+                ' VALUES (?, ?, ?,?,?, ?, ?,?,?,?,?,?)',
+                (room_number, bathroom_number, street_address, city, state, zip, price, sqft, name, description,
+                 g.user['user_id'], photo_URL)
             )
             db.commit()
             return redirect(url_for('apartment.index'))

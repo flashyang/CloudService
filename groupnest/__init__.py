@@ -39,6 +39,5 @@ def create_app(test_config=None):
     from . import reservation
     app.register_blueprint(reservation.bp)
 
-    app.add_url_rule('/', endpoint='index')
 
     return app

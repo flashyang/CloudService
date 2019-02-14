@@ -5,22 +5,29 @@
 {% endblock %}
 
 {% block content %}
-  <form method="Apartment">
-    <label for="title">Title</label>
-    <input name="title" id="title" value="{{ request.form['name'] }}" required>
-    <label for="body">Details</label>
-    <input name="room number" id="title" value="{{ request.form['room_number'] }}">
-      <input name="room number" id="title" value="{{ request.form['room_number'] }}">
-      <input name="bathroom_number" id="title" value="{{ request.form['bathroom_number'] }}">
-      <input name="street_address" id="title" value="{{ request.form['street_address'] }}">
-      <input name="city" id="title" value="{{ request.form['city'] }}">
-      <input name="state" id="title" value="{{ request.form['state'] }}">
-      <input name="zip" id="title" value="{{ request.form['zip'] }}">
-      <input name="price" id="title" value="{{ request.form['price'] }}">
-      <input name="sqft" id="title" value="{{ request.form['sqft'] }}">
-      <input name="photo_URL" id="title" value="{{ request.form['photo_URL'] }}">
-
-      <textarea name="body" id="body">{{ request.form['description'] }}</textarea>
+  <form method="post">
+      <label for="name">Apartment Name</label>
+    <input name="name" id="name" value="{{ request.form['name'] }}" required>
+    <label for="room_number">room_number</label>
+      <input name="room_number" id="room_number" value="{{ request.form['room_number'] }}" required>
+      <label for="bathroom_number">bathroom_number Name</label>
+      <input name="bathroom_number" id="bathroom_number" value="{{ request.form['bathroom_number'] }}" required>
+      <label for="name">street_address</label>
+      <input name="street_address" id="street_address" value="{{ request.form['street_address'] }}" required>
+      <label for="name">city</label>
+      <input name="city" id="city" value="{{ request.form['city'] }}" required>
+      <label for="name">state</label>
+      <input name="state" id="state" value="{{ request.form['state'] }}" required>
+      <label for="name">zip</label>
+      <input name="zip" id="zip" value="{{ request.form['zip'] }}" required>
+      <label for="name">price</label>
+      <input name="price" id="price" value="{{ request.form['price'] }}" required>
+      <label for="name">sqft</label>
+      <input name="sqft" id="sqft" value="{{ request.form['sqft'] }}" required>
+      <label for="name">photo_URL</label>
+      <input name="photo_URL" id="photo_URL" value="{{ request.form['photo_URL'] }}">
+<label for="description">description</label>
+      <textarea name="description" id="description">{{ request.form['description'] }}</textarea>
     <input type="submit" value="Save">
   </form>
 {% endblock %}

@@ -43,10 +43,11 @@ def search():
                 ' ORDER BY created DESC',
                 (zip,)
             ).fetchall()
-            if apartments is None:
+            if apartments:
+                return "Searching result is in construction"
+            else:
                 abort(404,
                       "No such apartment matching given zipcode exists in our databse. Sorry! :(")
-            return "Searching result is in construction"
     return redirect(url_for('apartment.index'))
 
 # Get a apartment by apartmentId

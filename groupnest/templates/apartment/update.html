@@ -1,0 +1,79 @@
+{% extends 'base.html' %} {% block header %}
+<h1>{% block title %}Edit "{{ apartment["name"] }}"{% endblock %}</h1>
+{% endblock %} {% block content %}
+<form method="post">
+  <label for="title">Title</label>
+  <input
+    name="title"
+    id="title"
+    value="{{ request.form['title'] or apartment['title'] }}"
+    required
+  />
+  <label for="body">Details</label>
+  <input
+    name="room number"
+    id="title"
+    value="{{ request.form['room_number'] or apartment['room_number']}}"
+  />
+  <input
+    name="room number"
+    id="title"
+    value="{{ request.form['room_number'] or apartment['room_number'] }}"
+  />
+  <input
+    name="bathroom_number"
+    id="title"
+    value="{{ request.form['bathroom_number'] or apartment['bathroom_number'] }}"
+  />
+  <input
+    name="street_address"
+    id="title"
+    value="{{ request.form['street_address'] or apartment['street_address']}}"
+  />
+  <input
+    name="city"
+    id="title"
+    value="{{ request.form['city'] or apartment['city']}}"
+  />
+  <input
+    name="state"
+    id="title"
+    value="{{ request.form['state'] or apartment['state']}}"
+  />
+  <input
+    name="zip"
+    id="title"
+    value="{{ request.form['zip'] or apartment['zip']}}"
+  />
+  <input
+    name="price"
+    id="title"
+    value="{{ request.form['price'] or apartment['price']}}"
+  />
+  <input
+    name="sqft"
+    id="title"
+    value="{{ request.form['sqft'] or apartment['sqft']}}"
+  />
+  <input
+    name="photo_URL"
+    id="title"
+    value="{{ request.form['photo_URL'] or apartment['photo_URL']}}"
+  />
+  <textarea
+    name="body"
+    id="body"
+    >{{ request.form['description'] or apartment['description'] }}</textarea
+  >
+  <input type="submit" value="Save" />
+</form>
+<hr />
+<form action="{{ apartmentId=apartment['apartment_id']) }}" method="post">
+  <input
+    class="danger"
+    type="submit"
+    value="Delete"
+    onclick="return confirm('Are you sure?');"
+  />
+</form>
+{% endblock %}

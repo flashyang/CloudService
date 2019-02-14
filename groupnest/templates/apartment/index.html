@@ -1,0 +1,25 @@
+{% extends 'base.html' %} {% block header %}
+<h1>{% block title %}Apartment List{% endblock %}</h1>
+{% if g.user %}
+<a class="action" href="{{ url_for('apartment.create') }}">New</a>
+{% endif %} {% endblock %} {% block content %} {% for apartment in apartments %}
+<article class="post">
+  <header>
+    <div>
+      <h1>{{ apartment["name"] }}</h1>
+      <div class="about">
+        by {{ apartment["landlord_id"] }} on
+        {{ apartment["created"].strftime("%Y-%m-%d") }}
+      </div>
+    </div>
+    <a
+      class="action"
+      href="{{ url_for('apartment.update', apartmentId=apartment['apartment_id']) }}"
+      >Edit</a
+    >
+  </header>
+  <p class="body">{{ apartment["description"] }}</p>
+</article>
+{% if not loop.last %}
+<hr />
+{% endif %} {% endfor %} {% endblock %}

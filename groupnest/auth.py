@@ -69,7 +69,7 @@ def login():
         if error is None:
             session.clear()
             session['user_id'] = user['user_id']
-            return "Successful login"
+            return redirect(url_for('apartment.index'))
 
         flash(error)
 
@@ -79,7 +79,7 @@ def login():
 @bp.route('/logout')
 def logout():
     session.clear()
-    return redirect(url_for('index'))
+    return redirect(url_for('apartment.index'))
 
 
 @bp.before_app_request

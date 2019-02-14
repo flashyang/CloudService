@@ -2,73 +2,71 @@
 <h1>{% block title %}Edit "{{ apartment["name"] }}"{% endblock %}</h1>
 {% endblock %} {% block content %}
 <form method="post">
-  <label for="title">Title</label>
+  <label for="name">Title</label>
   <input
-    name="title"
-    id="title"
-    value="{{ request.form['title'] or apartment['title'] }}"
+    name="name"
+    id="name"
+    value="{{ request.form['name'] or apartment['name'] }}"
     required
   />
-  <label for="body">Details</label>
+  {# <label for="room_number">Details</label>#} {#
   <input
-    name="room number"
-    id="title"
-    value="{{ request.form['room_number'] or apartment['room_number']}}"
-  />
-  <input
-    name="room number"
-    id="title"
+    name="room_number"
+    id="room_number"
     value="{{ request.form['room_number'] or apartment['room_number'] }}"
-  />
+  />#} {#
   <input
     name="bathroom_number"
-    id="title"
+    id="bathroom_number"
     value="{{ request.form['bathroom_number'] or apartment['bathroom_number'] }}"
-  />
+  />#} {#
   <input
     name="street_address"
-    id="title"
+    id="street_address"
     value="{{ request.form['street_address'] or apartment['street_address']}}"
-  />
+  />#} {#
   <input
     name="city"
-    id="title"
+    id="city"
     value="{{ request.form['city'] or apartment['city']}}"
-  />
+  />#} {#
   <input
     name="state"
-    id="title"
+    id="state"
     value="{{ request.form['state'] or apartment['state']}}"
-  />
+  />#} {#
   <input
     name="zip"
-    id="title"
+    id="zip"
     value="{{ request.form['zip'] or apartment['zip']}}"
-  />
+  />#} {#
   <input
     name="price"
-    id="title"
+    id="price"
     value="{{ request.form['price'] or apartment['price']}}"
-  />
+  />#} {#
   <input
     name="sqft"
-    id="title"
+    id="sqft"
     value="{{ request.form['sqft'] or apartment['sqft']}}"
-  />
+  />#} {#
   <input
     name="photo_URL"
-    id="title"
+    id="photo_URL"
     value="{{ request.form['photo_URL'] or apartment['photo_URL']}}"
-  />
+  />#} {#
   <textarea
-    name="body"
-    id="body"
+    name="description"
+    id="description"
     >{{ request.form['description'] or apartment['description'] }}</textarea
-  >
+  >#}
   <input type="submit" value="Save" />
 </form>
 <hr />
-<form action="{{ apartmentId=apartment['apartment_id']) }}" method="post">
+<form
+  action="{{ url_for('apartment.delete', apartmentId=apartment['apartment_id']) }}"
+  method="post"
+>
   <input
     class="danger"
     type="submit"

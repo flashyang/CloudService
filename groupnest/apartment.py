@@ -5,7 +5,7 @@ from werkzeug.exceptions import abort
 
 from groupnest.auth import login_required
 from groupnest.db import get_db
-import json
+
 
 bp = Blueprint('apartment', __name__, url_prefix='/apartment')
 
@@ -43,10 +43,10 @@ def search():
                 ' ORDER BY created DESC',
                 (zip,)
             ).fetchall()
-        if apartments is None:
-            abort(404,
-                  "No such apartment matching given zipcode exists in our databse. Sorry! :(")
-        return "Searching result is in construction"
+            if apartments is None:
+                abort(404,
+                      "No such apartment matching given zipcode exists in our databse. Sorry! :(")
+            return "Searching result is in construction"
     return redirect(url_for('apartment.index'))
 
 # Get a apartment by apartmentId

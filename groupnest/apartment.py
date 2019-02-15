@@ -190,6 +190,7 @@ def get_ownerList():
 
 # GET:/apartment/reserveList
 # Get the user's reservations
+# TODO: may select different attributes by joinning theree tables----> SHOULD DISCUSS
 @bp.route('/reserveList', methods=('GET',))
 @login_required
 def get_reserveList():

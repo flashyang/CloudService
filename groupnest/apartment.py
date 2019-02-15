@@ -53,7 +53,7 @@ def search():
 # Get a apartment by apartmentId
 
 
-def get_apartment(apartmentId):
+def get_apartment(apartmentId, check_user=True):
     apartment = get_db().execute(
         'SELECT *'
         ' FROM apartment'
@@ -64,15 +64,44 @@ def get_apartment(apartmentId):
     if apartment is None:
         abort(404, "Apartment id {0} doesn't exist.".format(apartmentId))
 
+    if check_user and apartment['landlord_id'] != g.user['user_id']:
+        abort(403, "You can only modify your own apartment.")
+
     return apartment
 
+
+'''
+Return a reservation for a given reservation id.
+'''
+
+
+def get_nest(reservation_id, check_user=True):
+    reservation = get_db().execute(
+        'SELECT reservation_id, nest_id, tenant_id, accept_offer'
+        ' FROM reservation'
+        ' WHERE reservation_id = ?',
+        (reservation_id,)
+    ).fetchone()
+
+    if reservation is None:
+        abort(404, "Reservation id {0} doesn't exist.".format(reservation_id))
+
+    if check_user and reservation['tenant_id'] != g.user['user_id']:
+        abort(403, "You can only modify your own reservation.")
+
+    return reservation
+
 # DELETE: /apartment/<int: apartmentId>/delete
+# TODO:应该把apartment相关的reservation也删除吧, 调用阳哥他们的package里的方法。
 @bp.route('/<int:apartmentId>/delete', methods=('POST',))
 @login_required
 def delete(apartmentId):
     get_apartment(apartmentId)
     db = get_db()
+    #reservation = get_reservation()
     db.execute('DELETE FROM apartment WHERE apartment_id = ?', (apartmentId,))
+    db.execute('DELETE FROM nest WHERE apartment_id = ?', (apartmentId,))
+   # db.execute('DELETE FROM reservation WHERE apartment_id = ?', (apartmentId,))
     db.commit()
     return redirect(url_for('apartment.index'))
 

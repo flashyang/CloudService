@@ -169,3 +169,21 @@ def create():
             return redirect(url_for('apartment.index'))
 
     return render_template('apartment/create.html')
+
+
+# GET:/apartment/ownerList
+# Get the landload's apartments
+@bp.route('/ownerList', methods=('GET',))
+@login_required
+def get_ownerList():
+    db = get_db()
+    ownerList = db.execute(
+        'SELECT *'
+        ' FROM apartment a JOIN user u ON a.landlord_id = u.user_id'
+        ' WHERE u.user_id = ?',
+        (g.user['user_id'],)
+    ).fetchall()
+    if not ownerList:
+        abort(404, "There is no apartments in your account:(")
+
+    return "List is in construction"

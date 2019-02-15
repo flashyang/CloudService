@@ -178,7 +178,7 @@ def create():
 def get_ownerList():
     db = get_db()
     ownerList = db.execute(
-        'SELECT *'
+        'SELECT a.name, a.street_address, a.price, username'
         ' FROM apartment a JOIN user u ON a.landlord_id = u.user_id'
         ' WHERE u.user_id = ?',
         (g.user['user_id'],)
@@ -186,4 +186,21 @@ def get_ownerList():
     if not ownerList:
         abort(404, "There is no apartments in your account:(")
 
-    return "List is in construction"
+    return "ownerList is in construction"
+
+# GET:/apartment/reserveList
+# Get the user's reservations
+@bp.route('/reserveList', methods=('GET',))
+@login_required
+def get_reserveList():
+    db = get_db()
+    reserveList = db.execute(
+        'SELECT r.nest_id,r.created,r.cancelled, username'
+        ' FROM reservation r JOIN user u ON r.tenant_id = u.user_id'
+        ' WHERE u.user_id = ?',
+        (g.user['user_id'],)
+    ).fetchall()
+    if not reserveList:
+        abort(404, "There is no reservations in your account:(")
+
+    return "reserveList is in construction"

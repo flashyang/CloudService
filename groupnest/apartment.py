@@ -100,9 +100,10 @@ def get_nests(apartmentId):
 def delete(apartmentId):
     nestList = get_nests(apartmentId)
     db = get_db()
-    for nest in nestList:
-        nestId = nest['nest_id']
-        db.execute('DELETE FROM reservation WHERE nest_id = ?', (nestId,))
+    if nestList is not None:
+        for nest in nestList:
+            nestId = nest['nest_id']
+            db.execute('DELETE FROM reservation WHERE nest_id = ?', (nestId,))
     db.execute('DELETE FROM nest WHERE apartment_id = ?', (apartmentId,))
     db.execute('DELETE FROM apartment WHERE apartment_id = ?', (apartmentId,))
     db.commit()

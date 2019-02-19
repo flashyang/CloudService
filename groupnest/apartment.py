@@ -70,38 +70,41 @@ def get_apartment(apartmentId, check_user=True):
     return apartment
 
 
-'''
-Return a reservation for a given reservation id.
-'''
+# get all the nest objects associated with the given apartmentId
 
 
-def get_nest(reservation_id, check_user=True):
-    reservation = get_db().execute(
-        'SELECT reservation_id, nest_id, tenant_id, accept_offer'
-        ' FROM reservation'
-        ' WHERE reservation_id = ?',
-        (reservation_id,)
-    ).fetchone()
+def get_nests(apartmentId):
+    # check if the given apartmentId is valid
+    apartment = get_db().execute(
+        'SELECT *'
+        ' FROM apartment'
+        ' WHERE apartment_id = ?',
+        (apartmentId,)
+    ).fetchall()
+    if apartment is None:
+        abort(404, "Apartment id {0} doesn't exist.".format(id))
 
-    if reservation is None:
-        abort(404, "Reservation id {0} doesn't exist.".format(reservation_id))
+    nestList = get_db().execute(
+        'SELECT *'
+        ' FROM nest'
+        ' WHERE apartment_id = ?',
+        (apartmentId,)
+    ).fetchall()
 
-    if check_user and reservation['tenant_id'] != g.user['user_id']:
-        abort(403, "You can only modify your own reservation.")
-
-    return reservation
+    return nestList
 
 # DELETE: /apartment/<int: apartmentId>/delete
-# TODO:应该把apartment相关的reservation也删除吧, 调用阳哥他们的package里的方法。
+# Delete all the apartment data including nest and reservations for giving apartmentId.
 @bp.route('/<int:apartmentId>/delete', methods=('POST',))
 @login_required
 def delete(apartmentId):
-    get_apartment(apartmentId)
+    nestList = get_nests(apartmentId)
     db = get_db()
-    #reservation = get_reservation()
     db.execute('DELETE FROM apartment WHERE apartment_id = ?', (apartmentId,))
     db.execute('DELETE FROM nest WHERE apartment_id = ?', (apartmentId,))
-   # db.execute('DELETE FROM reservation WHERE apartment_id = ?', (apartmentId,))
+    for nest in nestList:
+        nestId = nest['nest_id']
+        db.execute('DELETE FROM reservation WHERE nest_id = ?', (nestId,))
     db.commit()
     return redirect(url_for('apartment.index'))
 

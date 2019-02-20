@@ -12,7 +12,7 @@ bp = Blueprint('nest', __name__, url_prefix='/nest')
 # publicly available
 @bp.route('/<int:apartmentId>/fullNest')
 def get_fullNest(apartmentId):
-    fullNest = fullNest(apartmentId)
+    fullNest = fullNest_helper(apartmentId)
 
     return jsonify(fullNest)
 
@@ -20,7 +20,7 @@ def get_fullNest(apartmentId):
 # publicly available
 @bp.route('/<int:apartmentId>/notFullNest')
 def get_notFullNest(apartmentId):
-    notFullNest = notFullNest(apartmentId)
+    notFullNest = notFullNest_helper(apartmentId)
 
     return jsonify(notFullNest)
 
@@ -29,8 +29,8 @@ def get_notFullNest(apartmentId):
 @bp.route('<int:apartmentId>/allNests')
 def get_allNest(apartmentId):
     result = {}
-    result['fullnest'] = fullNest(apartmentId)
-    result['notFullnest'] = notFullNest(apartmentId)
+    result['fullnest'] = fullNest_helper(apartmentId)
+    result['notFullnest'] = notFullNest_helper(apartmentId)
 
     return jsonify(result)
 
@@ -39,13 +39,14 @@ def get_allNest(apartmentId):
 
 def get_nests(apartmentId):
     # check if the given apartmentId is valid
+    db = get_db()
     apartment = db.execute(
-        'SELECT *'
+        'SELECT name'
         ' FROM apartment'
         ' WHERE apartment_id = ?',
         (apartmentId,)
     ).fetchall()
-    if apartment is None:
+    if len(apartment) == 0:
         abort(404, "Apartment id {0} doesn't exist.".format(id))
 
     nestList = db.execute(
@@ -60,16 +61,17 @@ def get_nests(apartmentId):
 
 # Given apartmentId, get all associated full nest information, return number of room in the apartment, number of reservations alive in each nest, status of each nest.
 # publicly available
-def fullNest(apartmentId):
+def fullNest_helper(apartmentId):
     result = []
     nestList = get_nests(apartmentId)
     for index in range(len(nestList)):
         nest = nestList[index]
-        res = nestTwoNumber(nest.nest_id)
+        res = nestTwoNumber(nest['nest_id'])
         if res['room_number'] == res['user_number']:
             item = {}
             item['room_number'] = res['room_number']
             item['user_number'] = res['user_number']
+            item['nest_id'] = nest['nest_id']
             result.append(item)
 
     return result
@@ -78,16 +80,17 @@ def fullNest(apartmentId):
 # publicly available
 
 
-def notFullNest(apartmentId):
+def notFullNest_helper(apartmentId):
     result = []
     nestList = get_nests(apartmentId)
     for index in range(len(nestList)):
         nest = nestList[index]
-        res = nestTwoNumber(nest.nest_id)
+        res = nestTwoNumber(nest['nest_id'])
         if res['room_number'] != res['user_number']:
             item = {}
             item['room_number'] = res['room_number']
             item['user_number'] = res['user_number']
+            item['nest_id'] = nest['nest_id']
             result.append(item)
 
     return result
@@ -135,18 +138,20 @@ def get_nestUser(nestId):
 @bp.route('/<int:nestId>')
 @login_required
 def nestUser(nestId):
+    res = nestTwoNumber(nestId)
     item = {}
     item['room_number'] = res['room_number']
     item['user_list'] = get_nestUser(nestId)
-    item['user_number'] = item['user_list'].size()
+    item['user_number'] = res['user_number']
 
-    return jsonify(item)
+    return render_template('nest/detail.html', users=item['user_list'], room_number=item['room_number'], user_number=res['user_number'])
 
 # For the current user, get all associated nests info (nest info: number of rooms in the apartment, number of users currently added in the nest, apartment name, nest status, nest_id)
 # Only available for registered user
 @bp.route('/reserveNest')
 @login_required
 def get_reserveNest():
+    db = get_db()
     reservation_list = db.execute(
         'SELECT nest_id, accept_offer'
         ' FROM reservation'
@@ -157,7 +162,7 @@ def get_reserveNest():
     result = []
     for index in range(len(reservation_list)):
         reservation = reservation_list[index]
-        nest_id = reservation.nest_id
+        nest_id = reservation['nest_id']
         nest = db.execute(
             'SELECT apartment_id, status'
             ' FROM nest'
@@ -168,14 +173,14 @@ def get_reserveNest():
             'SELECT name'
             ' FROM apartment'
             ' WHERE apartment_id = ?',
-            (nest.apartment_id,)
+            (nest['apartment_id'],)
         ).fetchone()
-        res = nestTwoNumber(nest.nestId)
+        res = nestTwoNumber(nest_id)
         item = {}
         item['room_number'] = res['room_number']
         item['user_number'] = res['user_number']
-        item['apartment_name'] = apartment.name
-        item['status'] = nest.status
+        item['apartment_name'] = apartment['name']
+        item['status'] = nest['status']
         item['nest_id'] = nest_id
         result.append(item)
 
@@ -187,6 +192,7 @@ def get_reserveNest():
 @login_required
 def get_ownerNest():
     result = []
+    db = get_db()
     apartment_list = db.execute(
         'SELECT apartment_id, name'
         ' FROM apartment'
@@ -197,9 +203,9 @@ def get_ownerNest():
     for index in range(len(apartment_list)):
         apartment = apartment_list[index]
         item = {}
-        item['fullnest'] = fullNest(apartment.apartment_id)
-        item['notFullnest'] = notFullNest(apartment.apartment_id)
-        item['apartment_name'] = apartment.name
+        item['fullnest'] = fullNest_helper(apartment['apartment_id'])
+        item['notFullnest'] = notFullNest_helper(apartment['apartment_id'])
+        item['apartment_name'] = apartment['name']
         result.append(item)
 
     return jsonify(result)
@@ -218,11 +224,11 @@ def create(apartmentId):
             'SELECT apartment_id'
             ' FROM nest n JOIN reservation r ON n.nest_id = r.nest_id'
             ' WHERE r.tenant_id = ?'
-            # ' AND r.cancelled = 0'
+            ' AND n.apartment_id = ?'
             ' ORDER BY created DESC',
-            (g.user['user_id'],)
+            (g.user['user_id'], apartmentId)
         ).fetchall()
-        print(record)
+        print(g.user['user_id'])
         if len(record) != 0:
             error = 'User has already been added to one nest belong to this apartment. Please cancal the previous reservation and create a new nest again.'
 
@@ -245,7 +251,7 @@ def create(apartmentId):
             print('saved')
             return 'save successfully'
 
-    return "create nest page"
+    return render_template('nest/create.html')
 
 
 # Updates the nest status when the landlord approve or reject a full nest
@@ -293,7 +299,7 @@ def update(nestId):
             print(error)
             flash(error)
         else:
-            db.execute(
+            db.execute (
                 'UPDATE nest SET status = ?'
                 ' WHERE nest_id = ?',
                 (decision, nestId)

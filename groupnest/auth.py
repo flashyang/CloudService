@@ -69,10 +69,6 @@ def login():
         if error is None:
             session.clear()
             session['user_id'] = user['user_id']
-<<<<<<< HEAD
-            print(user['user_id'])
-=======
->>>>>>> a1de7480fe9485be0c06da327c979a3083582ec4
             return redirect(url_for('apartment.index'))
 
         flash(error)

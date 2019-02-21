@@ -76,12 +76,12 @@ def get_apartment(apartmentId, check_user=True):
 def get_nests(apartmentId):
     # check if the given apartmentId is valid
     apartment = get_db().execute(
-        'SELECT *'
+        'SELECT name'
         ' FROM apartment'
         ' WHERE apartment_id = ?',
         (apartmentId,)
     ).fetchall()
-    if apartment is None:
+    if len(apartment) == 0:
         abort(404, "Apartment id {0} doesn't exist.".format(id))
 
     nestList = get_db().execute(

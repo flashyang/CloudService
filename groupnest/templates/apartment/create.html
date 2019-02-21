@@ -1,0 +1,11 @@
+{% extends 'base.html' %} {% block header %}
+<h1>{% block title %}Create new Apartment{% endblock %}</h1>
+{% endblock %} {% block content %}
+<form method="POST">
+  <label for="title">Title</label>
+  <input name="title" id="name" value="{{ request.form['name'] }}" required />
+  <label for="body">Details</label>
+
+  <input type="submit" value="Save" />
+</form>
+{% endblock %}

@@ -221,7 +221,7 @@ def create(apartmentId):
         error = None
         # check if the user has been added to one of the nest associated with the given apartment
         record = db.execute(
-            'SELECT apartment_id'
+            'SELECT DISTINCT n.nest_id'
             ' FROM nest n JOIN reservation r ON n.nest_id = r.nest_id'
             ' WHERE r.tenant_id = ?'
             ' AND n.apartment_id = ?'
@@ -229,8 +229,8 @@ def create(apartmentId):
             (g.user['user_id'], apartmentId)
         ).fetchall()
         print(g.user['user_id'])
-        if len(record) != 0:
-            error = 'User has already been added to one nest belong to this apartment. Please cancal the previous reservation and create a new nest again.'
+        if len(record) >= 5:
+            error = 'User has already been added to five nests belong to this apartment. Please cancal the previous reservation and create a new nest again.'
 
         if error is not None:
             print(error)
@@ -294,7 +294,17 @@ def update(nestId):
         two_number = nestTwoNumber(nestId)
         if two_number['room_number'] != two_number['user_number']:
             error = 'Given nest is not full yet, landlord cannot alter nest status yet'
-
+        
+        #check if the current nest status is PENDING
+        nest_status = db.execute(
+            'SELECT status'
+            ' FROM nest n'
+            ' WHERE n.nest_id = ?'
+            (nestId,)
+        ).fetchone()
+        if nest_status != 'PENDING':
+            error = 'Cannot change nest status'
+        
         if error is not None:
             print(error)
             flash(error)

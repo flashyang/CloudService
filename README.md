@@ -36,6 +36,7 @@ flask init-db
 flask run
 
 
+git pull origin yangsun
 
 
 # Add gitignore

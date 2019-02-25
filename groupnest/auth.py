@@ -9,6 +9,7 @@ from groupnest.db import get_db
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
+
 @bp.route('/register', methods=('GET', 'POST'))
 def register():
     if request.method == 'POST':
@@ -36,7 +37,8 @@ def register():
             try:
                 db.execute(
                     'INSERT INTO user (username, password, first_name, last_name, email, gender, description) VALUES (?, ?, ?, ?, ?, ?, ?)',
-                    (username, generate_password_hash(password), first_name, last_name, email, gender, description)
+                    (username, generate_password_hash(password),
+                     first_name, last_name, email, gender, description)
                 )
                 db.commit()
                 return redirect(url_for('auth.login'))
@@ -46,6 +48,7 @@ def register():
         flash(error)
 
     return render_template('auth/register.html')
+
 
 @bp.route('/login', methods=('GET', 'POST'))
 def login():
@@ -72,10 +75,12 @@ def login():
 
     return render_template('auth/login.html')
 
+
 @bp.route('/logout')
 def logout():
     session.clear()
-    return redirect(url_for('index'))
+    return redirect(url_for('apartment.index'))
+
 
 @bp.before_app_request
 def load_logged_in_user():
@@ -87,6 +92,8 @@ def load_logged_in_user():
         g.user = get_db().execute(
             'SELECT * FROM user WHERE user_id = ?', (user_id,)
         ).fetchone()
+    print(user_id)
+
 
 def login_required(view):
     @functools.wraps(view)

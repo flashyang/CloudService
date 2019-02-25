@@ -1,5 +1,5 @@
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, url_for
+    Blueprint, flash, g, redirect, render_template, request, url_for,jsonify
 )
 from werkzeug.exceptions import abort
 
@@ -33,6 +33,7 @@ def search():
         if not zip:
             error = 'ZipCode is required.'
 
+        result = []
         if error is not None:
             flash(error)
         else:
@@ -44,7 +45,19 @@ def search():
                 (zip,)
             ).fetchall()
             if apartments:
-                return "Searching result is in construction"
+                for index in range(len(apartments)):
+                    apt = apartments[index]
+                    item = {}
+                    item['name'] = apt['name']
+                    item['room_number'] = apt['room_number']
+                    item['bathroom_number'] = apt['bathroom_number']
+                    item['zip'] = apt['zip']
+                    item['city'] = apt['city']
+                    item['state'] = apt['state']
+                    item['price'] = apt['price']
+                    item['sqft'] = apt['sqft']
+                    result.append(item)
+                return jsonify(result);
             else:
                 abort(404,
                       "No such apartment matching given zipcode exists in our databse. Sorry! :(")
@@ -204,6 +217,27 @@ def create():
     return render_template('apartment/create.html')
 
 
+
+# GET:  /apartment/<int: apartmentId>/browse
+# Get the apartment by given apartmentId
+@bp.route('/<int:apartmentId>/browse', methods=('GET',))
+def browse(apartmentId):
+    apt = get_apartment(apartmentId)
+    if apt:
+            item = {}
+            item['name'] = apt['name']
+            item['room_number'] = apt['room_number']
+            item['bathroom_number'] = apt['bathroom_number']
+            item['zip'] = apt['zip']
+            item['city'] = apt['city']
+            item['state'] = apt['state']
+            item['price'] = apt['price']
+            item['sqft'] = apt['sqft']
+            return jsonify(item);
+    else:
+        abort(404, "Apartment id {0} doesn't exist.".format(apartmentId))
+
+
 # GET:/apartment/ownerList
 # Get the landload's apartments
 @bp.route('/ownerList', methods=('GET',))
@@ -219,7 +253,19 @@ def get_ownerList():
     if not ownerList:
         abort(404, "There is no apartments in your account:(")
 
-    return "ownerList is in construction"
+    result = []
+    for index in range(len(ownerList)):
+        apt = ownerList[index]
+        item = {}
+        item['name'] = apt['name']
+        item['street_address'] = apt['street_address']
+        item['price'] = apt['price']
+        item['username'] = apt['username']
+        result.append(item)
+    return jsonify(result);
+
+    #return "ownerList is in construction"
+    return jsonify(ownerList);
 
 # GET:/apartment/reserveList
 # Get the user's reservations
@@ -237,4 +283,16 @@ def get_reserveList():
     if not reserveList:
         abort(404, "There is no reservations in your account:(")
 
-    return "reserveList is in construction"
+
+    result = []
+    for index in range(len(reserveList)):
+        apt = reserveList[index]
+        item = {}
+        item['nest_id'] = apt['nest_id']
+        item['created'] = apt['created']
+        item['cancelled'] = apt['cancelled']
+        item['username'] = apt['username']
+        result.append(item)
+    return jsonify(result);
+    #return "reserveList is in construction"
+    return jsonify(reserveList);

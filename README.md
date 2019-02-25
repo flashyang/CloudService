@@ -52,6 +52,7 @@ touch .gitignore
 # Github clone and push:
 
 git clone https://github.com/flashyang/CloudService.git
+git clone -b yangsun https://github.com/flashyang/CloudService
 
 cd CloudService
 

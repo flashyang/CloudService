@@ -21,6 +21,8 @@
 
 # Command Line for running:
 Flask activate the vitual environment:
+python3 -m venv venv
+
 . venv/bin/activate
 
 pip install -e .

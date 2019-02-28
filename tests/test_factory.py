@@ -1,4 +1,4 @@
-from flaskr import create_app
+from groupnest import create_app
 
 
 def test_config():

@@ -306,7 +306,6 @@ def update(nestId):
             error = 'Cannot change nest status'
         
         if error is not None:
-            print(error)
             flash(error)
         else:
             db.execute (
@@ -317,7 +316,7 @@ def update(nestId):
             db.commit()
             return 'update nest status'
 
-    return 'Hello, nest!'
+    return error
 
 
 # TODO: check input valid(id) && error handeling && log, unit test; API doc; database; cache; pipeline;

@@ -256,6 +256,7 @@ def create(apartmentId):
 
 # Updates the nest status when the landlord approve or reject a full nest
 # Only available for registered user
+# (form: approve, reject, pending)
 @bp.route('/<int:nestId>/update', methods=['GET', 'POST'])
 @login_required
 def update(nestId):
@@ -293,8 +294,8 @@ def update(nestId):
         two_number = nestTwoNumber(nestId)
         if two_number['room_number'] != two_number['user_number']:
             error = 'Given nest is not full yet, landlord cannot alter nest status yet'
-        
-        #check if the current nest status is PENDING
+
+        # check if the current nest status is PENDING
         nest_status = db.execute(
             'SELECT status'
             ' FROM nest n'
@@ -303,11 +304,11 @@ def update(nestId):
         ).fetchone()
         if nest_status != 'PENDING':
             error = 'Cannot change nest status'
-        
+
         if error is not None:
             flash(error)
         else:
-            db.execute (
+            db.execute(
                 'UPDATE nest SET status = ?'
                 ' WHERE nest_id = ?',
                 (decision, nestId)

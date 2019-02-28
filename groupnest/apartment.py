@@ -1,5 +1,5 @@
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, url_for,jsonify
+    Blueprint, flash, g, redirect, render_template, request, url_for, jsonify
 )
 from werkzeug.exceptions import abort
 
@@ -57,7 +57,7 @@ def search():
                     item['price'] = apt['price']
                     item['sqft'] = apt['sqft']
                     result.append(item)
-                return jsonify(result);
+                return jsonify(result)
             else:
                 abort(404,
                       "No such apartment matching given zipcode exists in our databse. Sorry! :(")
@@ -185,7 +185,6 @@ def create():
             error = 'title is required.'
         if not room_number:
             error = 'room number is required.'
-
         if not bathroom_number:
             error = 'bathroom number is required.'
         if not street_address:
@@ -217,23 +216,22 @@ def create():
     return render_template('apartment/create.html')
 
 
-
 # GET:  /apartment/<int: apartmentId>/browse
 # Get the apartment by given apartmentId
 @bp.route('/<int:apartmentId>/browse', methods=('GET',))
 def browse(apartmentId):
     apt = get_apartment(apartmentId)
     if apt:
-            item = {}
-            item['name'] = apt['name']
-            item['room_number'] = apt['room_number']
-            item['bathroom_number'] = apt['bathroom_number']
-            item['zip'] = apt['zip']
-            item['city'] = apt['city']
-            item['state'] = apt['state']
-            item['price'] = apt['price']
-            item['sqft'] = apt['sqft']
-            return jsonify(item);
+        item = {}
+        item['name'] = apt['name']
+        item['room_number'] = apt['room_number']
+        item['bathroom_number'] = apt['bathroom_number']
+        item['zip'] = apt['zip']
+        item['city'] = apt['city']
+        item['state'] = apt['state']
+        item['price'] = apt['price']
+        item['sqft'] = apt['sqft']
+        return jsonify(item)
     else:
         abort(404, "Apartment id {0} doesn't exist.".format(apartmentId))
 
@@ -262,10 +260,10 @@ def get_ownerList():
         item['price'] = apt['price']
         item['username'] = apt['username']
         result.append(item)
-    return jsonify(result);
+    return jsonify(result)
 
-    #return "ownerList is in construction"
-    return jsonify(ownerList);
+    # return "ownerList is in construction"
+    return jsonify(ownerList)
 
 # GET:/apartment/reserveList
 # Get the user's reservations
@@ -283,7 +281,6 @@ def get_reserveList():
     if not reserveList:
         abort(404, "There is no reservations in your account:(")
 
-
     result = []
     for index in range(len(reserveList)):
         apt = reserveList[index]
@@ -293,6 +290,6 @@ def get_reserveList():
         item['cancelled'] = apt['cancelled']
         item['username'] = apt['username']
         result.append(item)
-    return jsonify(result);
-    #return "reserveList is in construction"
-    return jsonify(reserveList);
+    return jsonify(result)
+    # return "reserveList is in construction"
+    return jsonify(reserveList)

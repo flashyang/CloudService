@@ -1,0 +1,37 @@
+{##}
+{##}
+{#{% extends 'base.html' %} {% block header %}#}
+{#<h1>{% block title %}Browse {{ apartment["name"] }}"{% endblock %}</h1>#}
+{#{% endblock %} {% block content %}#}
+{##}
+{#  <label for="name">Title</label>#}
+{#    <div class="about">#}
+{#        {{ apartment["name"] }}#}
+{#        {{ apartment["room_number"] }}#}
+{#        {{ apartment["bathroom_number"] }}#}
+{#        {{ apartment["street_address"] }}#}
+{#        {{ apartment["city"] }}#}
+{#        {{ apartment["state"] }}#}
+{#        {{ apartment["zip"] }}#}
+{#        {{ apartment["price"] }}#}
+{#        {{ apartment["sqft"] }}#}
+{#        {{ apartment["photo_URL"] }}#}
+{#        {{ apartment["description"] }}#}
+{#      </div>#}
+{#<hr />#}
+{##}
+{#{% endblock %}#}
+
+
+
+{% extends 'base.html' %} {% block header %}
+<h1>{% block title %}xxxxx{% endblock %}</h1>
+{% endblock %} {% block content %}
+<form method="POST">
+  <label for="title">Title</label>
+  <input name="title" id="name" value="{{ request.form['name'] }}" required />
+  <label for="body">Details</label>
+
+  <input type="submit" value="Save" />
+</form>
+{% endblock %}

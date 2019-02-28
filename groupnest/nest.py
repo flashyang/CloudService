@@ -256,7 +256,6 @@ def create(apartmentId):
 
 # Updates the nest status when the landlord approve or reject a full nest
 # Only available for registered user
-# (form: approve, reject，pending)
 @bp.route('/<int:nestId>/update', methods=['GET', 'POST'])
 @login_required
 def update(nestId):

@@ -6,7 +6,10 @@
 <article class="post">
   <header>
     <div>
-      <h1>{{ apartment["name"] + " " + "B" + "B" }}</h1>
+      <h1
+              class="action"
+      href="{{ url_for('apartment.browse', apartmentId=apartment['apartment_id']) }}"
+      >{{ apartment["name"] + " " + "B" + "B" }}</h1>
       <div class="about">
         by {{ apartment["landlord_id"] }} on
         {{ apartment["created"].strftime("%Y-%m-%d") }}

@@ -21,6 +21,8 @@
 
 # Command Line for running:
 Flask activate the vitual environment:
+python3 -m venv venv
+
 . venv/bin/activate
 
 pip install -e .
@@ -53,6 +55,7 @@ touch .gitignore
 # Github clone and push:
 
 git clone https://github.com/flashyang/CloudService.git
+git clone -b yangsun https://github.com/flashyang/CloudService
 
 cd CloudService
 

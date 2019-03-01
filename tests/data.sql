@@ -5,13 +5,13 @@ VALUES
     'first',
     'last',
     'test@gmail.com',
-    'female',
+    'FEMALE',
     'good'),
   ('other', 'pbkdf2:sha256:50000$kJPKsz6N$d2d4784f1b030a9761f5ccaeeaca413f27f2ecb76d6168407af962ddce849f79',
     'first',
     'last',
     'other@gmail.com',
-    'male',
+    'MALE',
     'good too');
 
 INSERT INTO apartment
@@ -25,7 +25,7 @@ INSERT INTO nest
 VALUES
   (1),
   (1),
-  (2);
+  (2);   
 
 INSERT INTO reservation
   (nest_id, tenant_id)

@@ -11,7 +11,7 @@ first_name TEXT,
 last_name TEXT,
 email TEXT,
 gender TEXT CHECK( gender IN ('MALE', 'FEMALE', 'OTHER')),
-description TEXT
+description TEXT DEFAULT ''
 );
 
 CREATE TABLE apartment (
@@ -23,12 +23,12 @@ street_address TEXT NOT NULL,
 city TEXT NOT NULL,
 state TEXT CHECK( state IN ('AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA', 'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY')) NOT NULL, 
 zip INTEGER NOT NULL,
-price INTEGER NOT NULL,
-sqft INTEGER NOT NULL,
+price INTEGER NOT NULL DEFAULT 0,
+sqft INTEGER NOT NULL DEFAULT 0,
 name TEXT,
-description TEXT,
+description TEXT DEFAULT '',
 landlord_id INTEGER NOT NULL,
-photo_URL TEXT,
+photo_URL TEXT DEFAULT '',
 FOREIGN KEY (landlord_id) REFERENCES user (user_id)
 );
 

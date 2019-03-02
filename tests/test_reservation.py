@@ -29,7 +29,7 @@ def test_exists_required(client, auth, path):
     ('reservation/create/nest_id/7', b'You can only 5 nests under one apartment.'),
     ('reservation/create/nest_id/1', b"Can't reserve, this nest is full."),
 ))
-def test_create_validate(client, auth, path):
+def test_create_validate(client, auth, path, message):
     auth.login()
     response = client.post(path, data={})
     assert message in response.data
@@ -46,7 +46,7 @@ def test_create(client, auth, app):
 @pytest.mark.parametrize(('path', 'message'), (
     ('reservation/1/accept_offer', b"Can't accept offer without approval from landlord."),
 ))
-def test_accept_offer_validate(client, auth, path):
+def test_accept_offer_validate(client, auth, path, message):
     auth.login()
     response = client.post(path, data={})
     assert message in response.data
@@ -65,7 +65,7 @@ def test_accept_offer(client, auth, app):
 @pytest.mark.parametrize(('path', 'message'), (
     ('reservation/2/delete', b"You can't cancel a reservation once accept offer."),
 ))
-def test_delete_validate(client, auth, path):
+def test_delete_validate(client, auth, path, message):
     auth.login()
     response = client.post(path, data={})
     assert message in response.data

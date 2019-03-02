@@ -54,22 +54,16 @@ from groupnest.db import get_db
 
 def test_create(client, auth, app):
 
-    client.post(
-        '/auth/login',
-        data={'username': 'test', 'password': 'pbkdf2:sha256:50000$TCI4GzcX$0de171a4f4dac32e3364c7ddc7c14f3e2fa61f2d17574483f7ffbb431b4acb2f',
-              'first_name': 'first', 'last_name': 'last', 'email': 'test@gmail.com', 'gender': 'FEMALE', 'description': 'good'}
-    )
-
-    # auth.login()
+    auth.login()
     response = client.get('/nest/11/create')
-    assert response.status_code == 401
-    data = json.loads(response.get_data(as_text=True))
-    assert b'Apartment not found.' == data['message']
+    assert response.status_code == 404
+    #data = json.loads(response.get_data(as_text=True))
+    assert b'Apartment not found.' in response.data
 
     assert client.get('/nest/1/create').status_code == 200
 
     for i in range(5):
-        response = client.post('/nest/2/create')
+        response = client.post('/nest/2/create', data={})
         with app.app_context():
             db = get_db()
             record = db.execute(

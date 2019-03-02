@@ -8,6 +8,8 @@ from werkzeug.exceptions import abort
 from groupnest.auth import login_required
 from groupnest.db import get_db
 
+import logging
+
 bp = Blueprint('nest', __name__, url_prefix='/nest')
 
 app = Flask(__name__)
@@ -221,7 +223,7 @@ def get_ownerNest():
 def create(apartmentId):
     # check if the given apartmentId exists
     db = get_db()
-    apartment = get_db().execute(
+    apartment = db.execute(
         'SELECT *'
         ' FROM apartment'
         ' WHERE apartment_id = ?',
@@ -233,12 +235,12 @@ def create(apartmentId):
     if apartment is None:
 
         logging.error('%s not found', apartmentId)
-        # abort(404, "Apartment not found.")
-        responseObject = {
-            'status': 'fail',
-            'message': 'Apartment not found.',
-        }
-        return make_response(jsonify(responseObject)), 404
+        abort(404, "Apartment not found.")
+        # responseObject = {
+        #     'status': 'fail',
+        #     'message': 'Apartment not found.',
+        # }
+        # return make_response(jsonify(responseObject)), 404
 
     if request.method == 'POST':
 
@@ -260,13 +262,14 @@ def create(apartmentId):
             logging.error(
                 'user has been added to more than 5 nests, request')
 
-            responseObject = {
-                'status': 'fail',
-                'message': 'User has already been added to five nests belong to this apartment. Please cancal the previous reservation and create a new nest again.',
-            }
-            return make_response(jsonify(responseObject)), 403
-            # abort(403, 'User has already been added to five nests belong to this apartment. Please cancal the previous reservation and create a new nest again.')
-
+            # responseObject = {
+            #     'status': 'fail',
+            #     'message': 'User has already been added to five nests belong to this apartment. Please cancal the previous reservation and create a new nest again.',
+            # }
+            # return make_response(jsonify(responseObject)), 403
+            #abort(403, 'User has already been added to five nests belong to this apartment. Please cancal the previous reservation and create a new nest again.')
+            error = 'User has already been added to five nests belong to this apartment. Please cancal the previous reservation and create a new nest again.'
+            flash(error)
         else:
             nest_id = db.execute(
                 'INSERT INTO nest (apartment_id)'
@@ -283,19 +286,22 @@ def create(apartmentId):
             )
             db.commit()
 
-            logging.info(
-                'reservation created for user %s and nest %s', (g.user['user_id'], nest_id))
+            logging.info('reservation created for user %s and nest %s', g.user['user_id'], nest_id)
 
-            responseObject = {
-                'status': 'success',
-                'message': 'Successfully created new reservasion.',
-            }
-            return make_response(jsonify(responseObject)), 201
-    responseObject = {
-        'status': 'success',
-        'message': 'Successfully get create nest',
-    }
-    return make_response(jsonify(responseObject)), 200
+            url = 'apartment/'+ apartmentId +'/browse'
+            return redirect(url_for(url))
+
+            # responseObject = {
+            #     'status': 'success',
+            #     'message': 'Successfully created new reservasion.',
+            # }
+            # return make_response(jsonify(responseObject)), 201
+    # responseObject = {
+    #     'status': 'success',
+    #     'message': 'Successfully get create nest',
+    # }
+    # return make_response(jsonify(responseObject)), 200
+    return render_template('nest/create.html')
 
 
 # Updates the nest status when the landlord approve or reject a full nest

@@ -1,4 +1,4 @@
-from flaskr import create_app
+from groupnest import create_app
 
 
 def test_config():
@@ -6,6 +6,6 @@ def test_config():
     assert create_app({'TESTING': True}).testing
 
 
-def test_hello(client):
-    response = client.get('/hello')
-    assert response.data == b'Hello, World!'
+# def test_hello(client):
+#     response = client.get('/hello')
+#     assert b'Hello, World!' in response.data

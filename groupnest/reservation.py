@@ -11,10 +11,15 @@ bp = Blueprint('reservation', __name__, url_prefix='/reservation')
 
 '''
 Create a new reservation in the given nest for login user.
+A user is not able to make a new reservation if he joined 5 nests.
 '''
 @bp.route('/create/nest_id/<int:nest_id>', methods=('POST',))
 @login_required
 def create(nest_id):
+    nest = get_nest(nest_id)
+    if  get_num_of_nests_in_one_apartment(g.user['user_id'], nest['apartment_id']) >= 5:
+        abort(403, "You can only 5 nests under one apartment.")
+
     if not is_nest_full(nest_id):
         db = get_db()
         cursor = db.cursor()
@@ -34,6 +39,19 @@ def create(nest_id):
         return error
 
     # return redirect(url_for('nest.index'))
+
+'''
+Return the number of nests the user has joined in the given apartment.
+'''
+def get_num_of_nests_in_one_apartment(user_id, apartment_id):
+    num_of_nests = get_db().execute(
+        'SELECT COUNT(DISTINCT r.nest_id)'
+        ' FROM reservation r JOIN nest n ON r.nest_id = n.nest_id'
+        ' WHERE r.tenant_id = ? and n.apartment_id = ?',
+        (user_id, apartment_id)
+    ).fetchone()
+
+    return num_of_nests
 
 '''
 Return a list of reservations in a given nest.
@@ -96,7 +114,8 @@ def get_reservation(reservation_id, check_user=True):
     return reservation
 
 '''
-Accept offer (accept offer = 1) when the nest is approved by landlord.
+Accept offer (set accept offer = 1) when the nest is approved by landlord.
+If this is the last person accept offer, change the status of other nest to be rejected.
 '''    
 @bp.route('/<int:reservation_id>/accept_offer', methods=('POST',))
 @login_required
@@ -113,7 +132,22 @@ def accept_offer(reservation_id):
         'WHERE reservation_id = ?',
         (1, reservation_id)
     )
+
+    '''
+    if this is the last person in the nest who accept offer, 
+    change the other nests in the associated apartment to be rejected.
+    '''
+    if all_accept_offer(nest['nest_id']):
+        nests = get_nests(nest['apartment_id'])
+        for n in nests:
+            if n['nest_id'] != nest['nest_id']:
+                db.execute(
+                    'UPDATE nest SET status = ?'
+                    'WHERE nest_id = ?',
+                    ('REJECTED', n['nest_id'])
+                )
     db.commit()
+
     rv = get_reservation(reservation_id)
     row_headers = ['reservation_id', 'nest_id', 'tenant_id', 'accept_offer']
     json_data = dict(zip(row_headers, rv))
@@ -141,20 +175,15 @@ def delete(reservation_id):
     db.execute('DELETE FROM reservation WHERE reservation_id = ?', (reservation_id,))
     error.append("Delete reservation id {0}".format(reservation_id))
 
-    # Update all the nests associate with this apartment to be pending, if previous nest status is approved
+    # Update the nest to be pending, if previous status is approved.
     nest = get_nest(reservation['nest_id'])
     if nest['status'] == "APPROVED":
-        nests = get_nests(nest['apartment_id'])
-        print("nests type: " + str(type(nests)) + "  number of nests: " + str(len(nests)))
-
-        for n in nests:
-            print("test: " + str(n['nest_id']))
-            db.execute(
-                'UPDATE nest SET status = ?'
-                ' WHERE nest_id = ?',
-                ("PENDING", n['nest_id'])
-            )
-        error.append("Nest status changed from APPROVED to PENDING.")
+        db.execute(
+            'UPDATE nest SET status = ?'
+            ' WHERE nest_id = ?',
+            ("PENDING", n['nest_id'])
+        )
+    error.append("Nest status changed from APPROVED to PENDING.")
 
     reservations = get_reservations(reservation['nest_id'])
     # Delete empty nest
@@ -206,3 +235,17 @@ def get_nests(apartment_id):
 
     return nests
 
+'''
+If a nest if full and all users in the nest has accepted offer, return true.
+Otherwise false.
+'''
+def all_accept_offer(nest_id):
+    if not is_nest_full:
+        return False
+
+    reservations = get_reservations(nest_id)
+    for r in reservations:
+        if r['accept_offer'] == 0:
+            return False
+    return True
+    

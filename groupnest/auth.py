@@ -1,7 +1,8 @@
 import functools
+import logging
 
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, session, url_for
+    Blueprint, flash, g, redirect, render_template, request, session, url_for, make_response, jsonify
 )
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -41,6 +42,7 @@ def register():
                      first_name, last_name, email, gender, description)
                 )
                 db.commit()
+                logging.info('One user registered!')
                 return redirect(url_for('auth.login'))
             except:
                 error = 'Gender should be male, female or other.'
@@ -69,11 +71,26 @@ def login():
         if error is None:
             session.clear()
             session['user_id'] = user['user_id']
-            return redirect(url_for('apartment.index'))
+            # return redirect(url_for('apartment.index'))
+            responseObject = {
+                'status': 'succeed',
+                'message': 'user login',
+            }
+            return make_response(jsonify(responseObject)), 200
 
-        flash(error)
+        # flash(error)
+        responseObject = {
+            'status': 'fail',
+            'message': error,
+        }
+        return make_response(jsonify(responseObject)), 403
 
-    return render_template('auth/login.html')
+        # return render_template('auth/login.html')
+    responseObject = {
+        'status': 'succeed',
+        'message': 'get login',
+    }
+    return make_response(jsonify(responseObject)), 200
 
 
 @bp.route('/logout')
@@ -99,7 +116,12 @@ def login_required(view):
     @functools.wraps(view)
     def wrapped_view(**kwargs):
         if g.user is None:
-            return redirect(url_for('auth.login'))
+            # return redirect(url_for('auth.login'))
+            responseObject = {
+                'status': 'fail',
+                'message': 'Login required'
+            }
+            return make_response(jsonify(responseObject)), 401
 
         return view(**kwargs)
 

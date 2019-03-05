@@ -14,7 +14,9 @@ bp = Blueprint('nest', __name__, url_prefix='/nest')
 
 app = Flask(__name__)
 
-# Given apartmentId, get all associated full nest information, return number of room in the apartment, number of reservations alive in each nest, status of each nest.
+# Given apartmentId, get all associated full nest information, 
+# return number of room in the apartment, number of reservations alive in each nest, 
+# status of each nest.
 # publicly available
 @bp.route('/<int:apartmentId>/fullNest')
 def get_fullNest(apartmentId):
@@ -22,7 +24,9 @@ def get_fullNest(apartmentId):
 
     return jsonify(fullNest)
 
-# Given apartmentId, get all associated nest information for the nests that are not full return number of room in the apartment, number of reservations alive in each nest, status of each nest.
+# Given apartmentId, get all associated nest information for the nests that are not full 
+# return number of room in the apartment, number of reservations alive in each nest, 
+# status of each nest.
 # publicly available
 @bp.route('/<int:apartmentId>/notFullNest')
 def get_notFullNest(apartmentId):
@@ -30,7 +34,8 @@ def get_notFullNest(apartmentId):
 
     return jsonify(notFullNest)
 
-# Given apartmentId, get all associated nest information, return number of room in the apartment, number of reservations alive in each nest, status of each nest.
+# Given apartmentId, get all associated nest information, return number of 
+# room in the apartment, number of reservations alive in each nest, status of each nest.
 # publicly available
 @bp.route('<int:apartmentId>/allNests')
 def get_allNest(apartmentId):
@@ -65,7 +70,8 @@ def get_nests(apartmentId):
     return nestList
 
 
-# Given apartmentId, get all associated full nest information, return number of room in the apartment, number of reservations alive in each nest, status of each nest.
+# Given apartmentId, get all associated full nest information, return number of 
+# room in the apartment, number of reservations alive in each nest, status of each nest.
 # publicly available
 def fullNest_helper(apartmentId):
     result = []
@@ -82,7 +88,9 @@ def fullNest_helper(apartmentId):
 
     return result
 
-# Given apartmentId, get all associated nest information for the nests that are not full return number of room in the apartment, number of reservations alive in each nest, status of each nest.
+# Given apartmentId, get all associated nest information for the nests that are not 
+# full return number of room in the apartment, number of reservations alive in each nest, 
+# status of each nest.
 # publicly available
 
 
@@ -125,21 +133,28 @@ def get_apartment(nestId):
     return apartment
 
 
-# Given nestId, get users added in the nest. (user info: first_name, last_name, email, gender, description)
+# Given nestId, get users added in the nest. (user info: first_name, last_name, email, 
+# gender, description)
 def get_nestUser(nestId):
     db = get_db()
-    user = db.execute(
-        'SELECT first_name, last_name, email, gender, description'
+    users = db.execute(
+        'SELECT username, first_name, last_name, email, gender, description'
         ' FROM reservation p JOIN user u ON p.tenant_id = u.user_id'
         ' WHERE p.nest_id = ?'
         # ' AND p.cancelled = 0'
         ' ORDER BY created DESC',
         (nestId,)
     ).fetchall()
-    return user
+    columns = ['username', 'first_name', 'last_name', 'email', 'gender', 'description']
+    res = []
+    for user in users:
+        res.append(dict(zip(columns, user)))
+    return res
 
 
-# Given nestId, get number of rooms in the associated apartment, number of reservations alive and the user information for the reservations alive(user info: first_name, last_name, email, gender, description)
+# Given nestId, get number of rooms in the associated apartment, number of reservations 
+# alive and the user information for the reservations alive(user info: first_name, last_name, 
+# email, gender, description)
 # Only available for registered user
 @bp.route('/<int:nestId>')
 @login_required
@@ -152,7 +167,8 @@ def nestUser(nestId):
 
     return jsonify(item)
 
-# For the current user, get all associated nests info (nest info: number of rooms in the apartment, number of users currently added in the nest, apartment name, nest status, nest_id)
+# For the current user, get all associated nests info (nest info: number of rooms 
+# in the apartment, number of users currently added in the nest, apartment name, nest status, nest_id)
 # Only available for registered user
 @bp.route('/reserveNest')
 @login_required
@@ -192,7 +208,9 @@ def get_reserveNest():
 
     return jsonify(result)
 
-# For the current user, get all the nests info for each apartment this user owns. Nest info includes number of rooms in the apartment, number of reservations alive in each nest, status of each nest.
+# For the current user, get all the nests info for each apartment this user owns. 
+# Nest info includes number of rooms in the apartment, number of reservations alive in each nest, 
+# status of each nest.
 # Only available for registered user
 @bp.route('/ownerNest')
 @login_required

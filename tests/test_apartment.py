@@ -19,6 +19,15 @@ def test_index(client, auth, app):
 def test_create(client, auth, app):
     auth.login()
     assert client.get('/create').status_code == 200
+    response = client.post('/create', data={'name': 'apartment1',
+                                            #'room_number': 5,
+                                            'bathroom_number':5,
+                                 'street_address':'225 terry ave n', 'city':'seattle', 'state':'WA', 'zip':98115,
+                                 'price': 250, 'sqft':3500, 'description':'big good'})
+    assert response.status_code == 403
+    assert b'room_number is required.' in response.data
+
+
     client.post('/create', data={'name': 'apartment1', 'room_number': 5, 'bathroom_number':5,
                                  'street_address':'225 terry ave n', 'city':'seattle', 'state':'WA', 'zip':98115,
                                  'price': 250, 'sqft':3500, 'description':'big good'})
@@ -35,6 +44,10 @@ def test_browse(client, auth, app):
     assert response.data == {'name': 'apartment1', 'room_number': 5, 'bathroom_number':5,
                                  'street_address':'225 terry ave n', 'city':'seattle', 'state':'WA', 'zip':98115,
                                  'price': 250, 'sqft':3500, 'description':'big good'}
+
+    response = client.get('/5/browse')
+    assert response.status_code == 404
+    assert b"Apartment id 5 doesn't exist." in response.data
 
 def test_search(client, auth, app):
     response = client.post('/search', data={'zip': ' '})

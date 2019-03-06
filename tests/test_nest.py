@@ -6,14 +6,14 @@ from groupnest.db import get_db
 def test_get_fullNest(client, auth, app):
     auth.login()
     response = client.get('/nest/1/fullNest')
-    data = json.loads(response.data)
-    assert 3 == len(data)
+    datas = json.loads(response.data)
+    assert 3 == len(datas)
 
 def test_get_notNest(client, auth, app):
     auth.login()
     response = client.get('/nest/1/notFullNest')
-    data = json.loads(response.data)
-    assert 3 == len(data)
+    datas = json.loads(response.data)
+    assert 3 == len(datas)
 
 def test_get_allNests(client, auth, app):
     auth.login()

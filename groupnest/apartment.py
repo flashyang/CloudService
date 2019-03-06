@@ -275,9 +275,15 @@ def get_ownerList():
         apt = ownerList[index]
         item = {}
         item['name'] = apt['name']
+        item['room_number'] = apt['room_number']
+        item['bathroom_number'] = apt['bathroom_number']
         item['street_address'] = apt['street_address']
+        item['zip'] = apt['zip']
+        item['city'] = apt['city']
+        item['state'] = apt['state']
         item['price'] = apt['price']
-        item['username'] = apt['username']
+        item['sqft'] = apt['sqft']
+        item['description'] = apt['description']
         result.append(item)
     return jsonify(result)
 

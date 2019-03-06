@@ -30,24 +30,48 @@ def test_create(client, auth, app):
 
     client.post('/create', data={'name': 'apartment1', 'room_number': 5, 'bathroom_number':5,
                                  'street_address':'225 terry ave n', 'city':'seattle', 'state':'WA', 'zip':98115,
-                                 'price': 250, 'sqft':3500, 'description':'big good'})
+                                 'price': 2500, 'sqft':2500, 'description':'big good'})
     with app.app_context():
         db = get_db()
-        count = db.execute('SELECT COUNT(id) FROM apartments').fetchone()[0]
-        assert count == 2
+        created = db.execute('SELECT * FROM post WHERE apartment_id = 4').fetchone()
+        assert created['price'] == 2500
 
 def test_browse(client, auth, app):
-    auth.login()
     assert client.get('/1/browse').status_code == 200
 
     response = client.get('/1/browse')
-    assert response.data == {'name': 'apartment1', 'room_number': 5, 'bathroom_number':5,
-                                 'street_address':'225 terry ave n', 'city':'seattle', 'state':'WA', 'zip':98115,
-                                 'price': 250, 'sqft':3500, 'description':'big good'}
+    assert response.data == {'name': 'apt1', 'room_number': 2, 'bathroom_number':2,
+                                 'street_address':'HAHA', 'city':'Seattle', 'state':'WA', 'zip':98107,
+                                 'price': 2500, 'sqft':2500, 'description':'', 'photo_URL':'','apartment_id':1}
 
     response = client.get('/5/browse')
     assert response.status_code == 404
     assert b"Apartment id 5 doesn't exist." in response.data
+
+def test_get_ownerList(client, auth, app):
+    with app.app_context():
+        db = get_db()
+        db.execute('UPDATE user SET user_id = 2')
+        db.commit()
+
+    auth.login()
+    assert client.get('/ownerList').status_code == 200
+
+    response = client.get('/ownerList')
+    assert response.data == {'name': 'apt2', 'room_number': 2, 'bathroom_number':1,
+                                 'street_address':'HAHA', 'city':'Seattle', 'state':'WA', 'zip':98107,
+                                 'price': 2500, 'sqft':2500, 'description':'', 'photo_URL':'','description':''}
+
+    with app.app_context():
+        db = get_db()
+        db.execute('UPDATE user SET user_id = 3')
+        db.commit()
+
+    response = client.get('/ownerList')
+
+    auth.login()
+    assert response.status_code == 404
+    assert b"There is no apartments in your account:(" in response.data
 
 def test_search(client, auth, app):
     response = client.post('/search', data={'zip': ' '})

@@ -7,13 +7,13 @@ def test_get_fullNest(client, auth, app):
     auth.login()
     response = client.get('/nest/1/fullNest')
     datas = json.loads(response.data)
-    assert 3 == len(datas)
+    assert 2 == len(datas)
 
-def test_get_notNest(client, auth, app):
+def test_get_notfullNest(client, auth, app):
     auth.login()
     response = client.get('/nest/1/notFullNest')
     datas = json.loads(response.data)
-    assert 3 == len(datas)
+    assert 4 == len(datas)
 
 def test_get_allNests(client, auth, app):
     auth.login()
@@ -59,8 +59,8 @@ def test_get_ownerNest(client, auth, app):
     response = client.get('/nest/ownerNest')
     data = json.loads(response.data)
     assert 2 == len(data)
-    assert 3 == len(data[0]['fullnest'])
-    assert 3 == len(data[0]['notFullnest'])
+    assert 2 == len(data[0]['fullnest'])
+    assert 4 == len(data[0]['notFullnest'])
     assert 'apt1' == data[0]['apartment_name']
     assert 1 == len(data[1]['fullnest'])
     assert 0 == len(data[1]['notFullnest'])

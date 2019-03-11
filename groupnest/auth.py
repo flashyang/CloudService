@@ -71,26 +71,11 @@ def login():
         if error is None:
             session.clear()
             session['user_id'] = user['user_id']
-            # return redirect(url_for('apartment.index'))
-            responseObject = {
-                'status': 'succeed',
-                'message': 'user login',
-            }
-            return make_response(jsonify(responseObject)), 200
+            return redirect(url_for('index'))
 
-        # flash(error)
-        responseObject = {
-            'status': 'fail',
-            'message': error,
-        }
-        return make_response(jsonify(responseObject)), 403
+        flash(error)
 
-        # return render_template('auth/login.html')
-    responseObject = {
-        'status': 'succeed',
-        'message': 'get login',
-    }
-    return make_response(jsonify(responseObject)), 200
+    return render_template('auth/login.html')
 
 
 @bp.route('/logout')
@@ -116,12 +101,7 @@ def login_required(view):
     @functools.wraps(view)
     def wrapped_view(**kwargs):
         if g.user is None:
-            # return redirect(url_for('auth.login'))
-            responseObject = {
-                'status': 'fail',
-                'message': 'Login required'
-            }
-            return make_response(jsonify(responseObject)), 401
+            return redirect(url_for('auth.login'))
 
         return view(**kwargs)
 

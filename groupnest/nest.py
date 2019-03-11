@@ -8,11 +8,15 @@ from werkzeug.exceptions import abort
 from groupnest.auth import login_required
 from groupnest.db import get_db
 
+import logging
+
 bp = Blueprint('nest', __name__, url_prefix='/nest')
 
 app = Flask(__name__)
 
-# Given apartmentId, get all associated full nest information, return number of room in the apartment, number of reservations alive in each nest, status of each nest.
+# Given apartmentId, get all associated full nest information, 
+# return number of room in the apartment, number of reservations alive in each nest, 
+# status of each nest.
 # publicly available
 @bp.route('/<int:apartmentId>/fullNest')
 def get_fullNest(apartmentId):
@@ -20,7 +24,9 @@ def get_fullNest(apartmentId):
 
     return jsonify(fullNest)
 
-# Given apartmentId, get all associated nest information for the nests that are not full return number of room in the apartment, number of reservations alive in each nest, status of each nest.
+# Given apartmentId, get all associated nest information for the nests that are not full 
+# return number of room in the apartment, number of reservations alive in each nest, 
+# status of each nest.
 # publicly available
 @bp.route('/<int:apartmentId>/notFullNest')
 def get_notFullNest(apartmentId):
@@ -28,7 +34,8 @@ def get_notFullNest(apartmentId):
 
     return jsonify(notFullNest)
 
-# Given apartmentId, get all associated nest information, return number of room in the apartment, number of reservations alive in each nest, status of each nest.
+# Given apartmentId, get all associated nest information, return number of 
+# room in the apartment, number of reservations alive in each nest, status of each nest.
 # publicly available
 @bp.route('<int:apartmentId>/allNests')
 def get_allNest(apartmentId):
@@ -63,7 +70,8 @@ def get_nests(apartmentId):
     return nestList
 
 
-# Given apartmentId, get all associated full nest information, return number of room in the apartment, number of reservations alive in each nest, status of each nest.
+# Given apartmentId, get all associated full nest information, return number of 
+# room in the apartment, number of reservations alive in each nest, status of each nest.
 # publicly available
 def fullNest_helper(apartmentId):
     result = []
@@ -80,7 +88,9 @@ def fullNest_helper(apartmentId):
 
     return result
 
-# Given apartmentId, get all associated nest information for the nests that are not full return number of room in the apartment, number of reservations alive in each nest, status of each nest.
+# Given apartmentId, get all associated nest information for the nests that are not 
+# full return number of room in the apartment, number of reservations alive in each nest, 
+# status of each nest.
 # publicly available
 
 
@@ -123,21 +133,28 @@ def get_apartment(nestId):
     return apartment
 
 
-# Given nestId, get users added in the nest. (user info: first_name, last_name, email, gender, description)
+# Given nestId, get users added in the nest. (user info: first_name, last_name, email, 
+# gender, description)
 def get_nestUser(nestId):
     db = get_db()
-    user = db.execute(
-        'SELECT first_name, last_name, email, gender, description'
+    users = db.execute(
+        'SELECT username, first_name, last_name, email, gender, description'
         ' FROM reservation p JOIN user u ON p.tenant_id = u.user_id'
         ' WHERE p.nest_id = ?'
         # ' AND p.cancelled = 0'
         ' ORDER BY created DESC',
         (nestId,)
     ).fetchall()
-    return user
+    columns = ['username', 'first_name', 'last_name', 'email', 'gender', 'description']
+    res = []
+    for user in users:
+        res.append(dict(zip(columns, user)))
+    return res
 
 
-# Given nestId, get number of rooms in the associated apartment, number of reservations alive and the user information for the reservations alive(user info: first_name, last_name, email, gender, description)
+# Given nestId, get number of rooms in the associated apartment, number of reservations 
+# alive and the user information for the reservations alive(user info: first_name, last_name, 
+# email, gender, description)
 # Only available for registered user
 @bp.route('/<int:nestId>')
 @login_required
@@ -150,7 +167,8 @@ def nestUser(nestId):
 
     return jsonify(item)
 
-# For the current user, get all associated nests info (nest info: number of rooms in the apartment, number of users currently added in the nest, apartment name, nest status, nest_id)
+# For the current user, get all associated nests info (nest info: number of rooms 
+# in the apartment, number of users currently added in the nest, apartment name, nest status, nest_id)
 # Only available for registered user
 @bp.route('/reserveNest')
 @login_required
@@ -190,7 +208,9 @@ def get_reserveNest():
 
     return jsonify(result)
 
-# For the current user, get all the nests info for each apartment this user owns. Nest info includes number of rooms in the apartment, number of reservations alive in each nest, status of each nest.
+# For the current user, get all the nests info for each apartment this user owns. 
+# Nest info includes number of rooms in the apartment, number of reservations alive in each nest, 
+# status of each nest.
 # Only available for registered user
 @bp.route('/ownerNest')
 @login_required
@@ -221,7 +241,7 @@ def get_ownerNest():
 def create(apartmentId):
     # check if the given apartmentId exists
     db = get_db()
-    apartment = get_db().execute(
+    apartment = db.execute(
         'SELECT *'
         ' FROM apartment'
         ' WHERE apartment_id = ?',
@@ -233,12 +253,12 @@ def create(apartmentId):
     if apartment is None:
 
         logging.error('%s not found', apartmentId)
-        # abort(404, "Apartment not found.")
-        responseObject = {
-            'status': 'fail',
-            'message': 'Apartment not found.',
-        }
-        return make_response(jsonify(responseObject)), 404
+        abort(404, "Apartment not found.")
+        # responseObject = {
+        #     'status': 'fail',
+        #     'message': 'Apartment not found.',
+        # }
+        # return make_response(jsonify(responseObject)), 404
 
     if request.method == 'POST':
 
@@ -260,13 +280,7 @@ def create(apartmentId):
             logging.error(
                 'user has been added to more than 5 nests, request')
 
-            responseObject = {
-                'status': 'fail',
-                'message': 'User has already been added to five nests belong to this apartment. Please cancal the previous reservation and create a new nest again.',
-            }
-            return make_response(jsonify(responseObject)), 403
-            # abort(403, 'User has already been added to five nests belong to this apartment. Please cancal the previous reservation and create a new nest again.')
-
+            abort(403, 'User has already been added to five nests belong to this apartment. Please cancal the previous reservation and create a new nest again.')
         else:
             nest_id = db.execute(
                 'INSERT INTO nest (apartment_id)'
@@ -283,19 +297,11 @@ def create(apartmentId):
             )
             db.commit()
 
-            logging.info(
-                'reservation created for user %s and nest %s', (g.user['user_id'], nest_id))
+            logging.info('reservation created for user %s and nest %s', g.user['user_id'], nest_id)
 
-            responseObject = {
-                'status': 'success',
-                'message': 'Successfully created new reservasion.',
-            }
-            return make_response(jsonify(responseObject)), 201
-    responseObject = {
-        'status': 'success',
-        'message': 'Successfully get create nest',
-    }
-    return make_response(jsonify(responseObject)), 200
+            return redirect(url_for('nest.nestUser', nestId=nest_id))
+
+    return render_template('nest/create.html')
 
 
 # Updates the nest status when the landlord approve or reject a full nest
@@ -309,20 +315,15 @@ def update(nestId):
     cur_nest = db.execute(
         'SELECT status'
         ' FROM nest'
-        ' WHERE nest_id = ?'
+        ' WHERE nest_id = ?',
         (nestId,)
     ).fetchone()
 
     logging.info('fetch nest with Id %s', nestId)
 
     if cur_nest is None:
-        # abort(404, "Nest not found")
         logging.error('%s not found', nestId)
-        responseObject = {
-            'status': 'fail',
-            'message': 'Nest not found.',
-        }
-        return make_response(jsonify(responseObject)), 404
+        abort(404, "Nest not found")
 
     if request.method == 'POST':
         decision = request.form['decision']
@@ -330,22 +331,12 @@ def update(nestId):
 
         if not decision:
             logging.error('No decision provided. Error message sent.')
-            error = 'Decision is required.'
-            responseObject = {
-                'status': 'fail',
-                'message': error
-            }
-            return make_response(jsonify(responseObject)), 403
+            abort(404, "Decision is required.")
 
         if cur_nest['status'] != 'PENDING':
-            error = 'Cannot change nest status that is not PENDING'
             logging.error(
                 'target nest status is %s, cannot change to other status.', cur_nest['status'])
-            responseObject = {
-                'status': 'fail',
-                'message': error
-            }
-            return make_response(jsonify(responseObject)), 403
+            abort(403, 'Cannot change nest status that is not PENDING')
 
         # check if current user is the landlord of the apartment associated with the nest with the given nest_id
         owner = db.execute(
@@ -357,12 +348,8 @@ def update(nestId):
         if owner['landlord_id'] != g.user['user_id']:
             error = 'Current user is not authorized to alter the status of this nest.'
             logging.error('current user id is %s, not equal to the landloard id %s',
-                          (owner['landlord_id'], g.user['user_id']))
-            responseObject = {
-                'status': 'fail',
-                'message': error
-            }
-            return make_response(jsonify(responseObject)), 403
+                          owner['landlord_id'], g.user['user_id'])
+            abort(403, error)
 
         # check if the landlord has already approved a nest
         apartment = get_apartment(nestId)
@@ -376,23 +363,15 @@ def update(nestId):
         if len(approved_nest) != 0 and request.form['decision'] == 'APPROVED':
             error = 'Landlord has already approved one nest'
             logging.error(error)
-            responseObject = {
-                'status': 'fail',
-                'message': error
-            }
-            return make_response(jsonify(responseObject)), 403
+            abort(403, error)
 
         # check if the given nest is full
         two_number = nestTwoNumber(nestId)
         if two_number['room_number'] != two_number['user_number']:
             error = 'This nest is not full yet, landlord cannot alter nest status'
             logging.error('nest has %s/%s users added. Cannot change the status of a nest to be filled',
-                          (two_number['user_number'], two_number['room_number']))
-            responseObject = {
-                'status': 'fail',
-                'message': error
-            }
-            return make_response(jsonify(responseObject)), 403
+                          two_number['user_number'], two_number['room_number'])
+            abort(403, error)
 
         # if error is not None:
         #     return error
@@ -404,17 +383,10 @@ def update(nestId):
         )
         db.commit()
         logging.info('updated nest %s status', nestId)
-        responseObject = {
-            'status': 'succeed',
-            'message': 'updated nest status'
-        }
-        return make_response(jsonify(responseObject)), 200
+        redirect(url_for('nest.nestUser', nestId=nestId))
+        #abort(200, 'updated nest status')
 
-    responseObject = {
-        'status': 'succeed',
-        'message': 'get update nest'
-    }
-    return make_response(jsonify(responseObject)), 200
+    return redirect(url_for('nest.nestUser', nestId=nestId))
 
 
 # TODO: check input valid(id) && error handeling && log, unit test; API doc; database; cache; pipeline;

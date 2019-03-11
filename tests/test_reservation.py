@@ -1,22 +1,23 @@
-# import pytest
-# from groupnest.db import get_db
+import pytest
+from groupnest.db import get_db
 
-# @pytest.mark.parametrize('path', (
-#     'reservation/create/nest_id/1',
-#     'reservation/1/accept_offer',
-#     'reservation/1/delete',
-# ))
-# def test_login_required(client, path):
-#     response = client.post(path)
-#     assert response.headers['Location'] == 'http://localhost/auth/login'
+@pytest.mark.parametrize('path', (
+    'reservation/create/nest_id/1',
+    'reservation/1/accept_offer',
+    'reservation/1/delete',
+))
+def test_login_required(client, path):
+    response = client.post(path)
+    assert response.headers['Location'] == 'http://localhost/auth/login'
 
-# def test_author_required(app, client, auth):
+def test_author_required(app, client, auth):
 
-#     auth.login()
-#     # current user can't modify other user's reservation
-#     assert client.post('reservation/2/accept_offer').status_code == 403
-#     assert client.post('reservation/2/delete').status_code == 403
+    auth.login()
+    # current user can't modify other user's reservation
+    assert client.post('reservation/2/accept_offer').status_code == 403
+    assert client.post('reservation/2/delete').status_code == 403
     
+<<<<<<< HEAD
 # @pytest.mark.parametrize('path', (
 #     'reservation/20/update',
 #     'reservation/20/delete',
@@ -24,6 +25,15 @@
 # def test_exists_required(client, auth, path):
 #     auth.login()
 #     assert client.post(path).status_code == 404
+=======
+@pytest.mark.parametrize('path', (
+    'reservation/20/update',
+    'reservation/20/delete',
+))
+def test_exists_required(client, auth, path):
+    auth.login()
+    assert client.post(path).status_code == 404
+>>>>>>> 94b9c411372e613dba2b540fca59f8fcbf8c533a
 
 @pytest.mark.parametrize(('path', 'message'), (
     ('reservation/create/nest_id/7', b'You can only join five nests under one apartment.'),
@@ -50,11 +60,19 @@ def test_accept_offer_validate(client, auth, path, message):
     auth.login()
     response = client.post(path, data={})
     assert message in response.data
+<<<<<<< HEAD
 
 # def test_accept_offer(client, auth, app):
 #     auth.login()
 #     client.post('reservation/1/accept_offer', data={})
 
+=======
+
+def test_accept_offer(client, auth, app):
+    auth.login()
+    client.post('reservation/1/accept_offer', data={})
+
+>>>>>>> 94b9c411372e613dba2b540fca59f8fcbf8c533a
     with app.app_context():
         db = get_db()
         reservation = db.execute('SELECT * FROM reservation WHERE reservation_id = 1').fetchone()
@@ -71,12 +89,25 @@ def test_delete_validate(client, auth, path, message):
     response = client.post(path, data={})
     assert message in response.data
 
-# def test_delete(client, auth, app):
-#     auth.login()
-#     response = client.post('reservation/1/delete')
+def test_delete(client, auth, app):
+    auth.login()
+    response = client.post('reservation/1/delete')
 
+<<<<<<< HEAD
 #     auth.login()
 #     response = client.post('reservation/4/delete')
+=======
+    with app.app_context():
+        db = get_db()
+        reservation = db.execute('SELECT * FROM reservation WHERE reservation_id = 1').fetchone()
+        assert reservation is None
+        nest = db.execute('SELECT * FROM nest WHERE nest_id = 1').fetchone()
+        assert nest['status'] == 'PENDING'
+
+def test_delete_empty_nest(client, auth, app):
+    auth.login()
+    response = client.post('reservation/4/delete')
+>>>>>>> 94b9c411372e613dba2b540fca59f8fcbf8c533a
 
     with app.app_context():
         db = get_db()

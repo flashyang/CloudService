@@ -99,25 +99,6 @@ def test_create(client, auth, app):
             assert b'User has already been added to five nests belong to this apartment. Please cancal the previous reservation and create a new nest again.' in response.data
             assert len(record) == 5
 
-    # # clean up
-    # for i in range(5):
-    #     with app.app_context():
-    #         db = get_db()
-    #         db.execute(
-    #             'DELETE'
-    #             ' FROM reservation'
-    #             ' WHERE nest_id = ?'
-    #             (4+i,)
-    #         )
-    #         db.commit()
-    #         db.execute(
-    #             'DELETE'
-    #             ' FROM nest'
-    #             ' WHERE nest_id = ?'
-    #             (4+i,)
-    #         )
-    #         db.commit()
-
 
 def test_update(client, auth, app):
     auth.login()

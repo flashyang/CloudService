@@ -18,7 +18,7 @@ A user is not able to make a new reservation if he joined 5 nests.
 def create(nest_id):
     nest = get_nest(nest_id)
     if  get_num_of_nests_in_one_apartment(g.user['user_id'], nest['apartment_id']) >= 5:
-        abort(403, "You can only 5 nests under one apartment.")
+        abort(403, "You can only join five nests under one apartment.")
 
     if not is_nest_full(nest_id):
         db = get_db()
@@ -45,13 +45,14 @@ Return the number of nests the user has joined in the given apartment.
 '''
 def get_num_of_nests_in_one_apartment(user_id, apartment_id):
     num_of_nests = get_db().execute(
-        'SELECT COUNT(DISTINCT r.nest_id)'
+        'SELECT COUNT(DISTINCT r.nest_id) c' 
         ' FROM reservation r JOIN nest n ON r.nest_id = n.nest_id'
         ' WHERE r.tenant_id = ? and n.apartment_id = ?',
         (user_id, apartment_id)
     ).fetchone()
 
-    return num_of_nests
+    print("number of nests in apartment ", apartment_id, " that user ", user_id, " joined is: ", num_of_nests['c'])
+    return num_of_nests['c']
 
 '''
 Return a list of reservations in a given nest.
@@ -181,7 +182,7 @@ def delete(reservation_id):
         db.execute(
             'UPDATE nest SET status = ?'
             ' WHERE nest_id = ?',
-            ("PENDING", n['nest_id'])
+            ("PENDING", nest['nest_id'])
         )
     error.append("Nest status changed from APPROVED to PENDING.")
 

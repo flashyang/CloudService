@@ -77,13 +77,13 @@ def test_update_appartment(client, auth, app):
 def test_create(client, auth, app):
     auth.login()
     assert client.get('/apartment/create').status_code == 200
-    response = client.post('/create', data={#'name': 'apartment1',
+    response = client.post('/apartment/create', data={'name': '',
                                             'room_number': 5,
                                             'bathroom_number':5,
                                  'street_address':'225 terry ave n', 'city':'seattle', 'state':'WA', 'zip':98115,
-                                 'price': 250, 'sqft':3500, 'description':'big good'})
-    assert response.status_code == 404
-    #assert b'name is required.' in response.data
+                                 'price': 250, 'sqft':3500, 'description':'big good','photo_URL':''})
+    assert response.status_code == 200
+    assert b'name is required.' in response.data
 
 
     client.post('/create', data={'name': 'apartment1', 'room_number': 5, 'bathroom_number':5,
@@ -95,21 +95,21 @@ def test_create(client, auth, app):
         assert created['zip'] == 98107
 
 def test_browse(client, auth, app):
-    response = client.get('/1/browse')
-    #assert response.status_code == 200
-    # datas = json.loads(response.data)
-    # assert datas['room_number'] == 2
-    # assert datas['bathroom_number'] == 2
-    # assert datas['zip'] == '98107'
-    # assert datas['street_address'] == 'HAHA'
-    # assert datas['city'] == 'Seattle'
-    # assert datas['state'] == 'WA'
-    # assert datas['name'] == 'apt1'
-    # assert datas['landlord_id'] == 1
+    response = client.get('/apartment/2/browse')
+    assert response.status_code == 200
+    datas = json.loads(response.data)
+    assert datas['room_number'] == 2
+    assert datas['bathroom_number'] == 1
+    assert datas['zip'] == 98107
+    assert datas['street_address'] == 'HAHA'
+    assert datas['city'] == 'Seattle'
+    assert datas['state'] == 'WA'
+    assert datas['name'] == 'apt2'
+    assert datas['landlord_id'] == 2
 
-    response = client.get('/5/browse')
+    response = client.get('/apartment/5/browse')
     assert response.status_code == 404
-    #assert b"Apartment id 5 doesn't exist." in response.data
+    assert b"Apartment id 5 doesn't exist." in response.data
 
 def test_get_ownerList(client, auth, app):
         auth.login()
@@ -126,12 +126,4 @@ def test_get_reservationList(client, auth, app):
 
         assert 8 == len(datas)
         assert datas[7]['accept_offer'] == 0
-
-
-        # with app.app_context():
-        #     db = get_db()
-        #     db.execute('UPDATE user SET user_id = 13')
-        #     db.commit()
-        # auth.login()
-        # assert response.status_code == 404
-        # assert b"There is no reservations in your account:(" in response.data
+        assert datas[1]['nest_id'] == 3

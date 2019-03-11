@@ -5,8 +5,9 @@ from flask import Flask
 
 def create_app(test_config=None):
 
-    from logging.config import dictConfig
     # create a logging configuration
+    from logging.config import dictConfig
+
     dictConfig({
         'version': 1,
         'formatters': {'default': {

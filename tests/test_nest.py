@@ -1,5 +1,6 @@
 import pytest
 import json
+import logging
 from flask import g, session
 from groupnest.db import get_db
 
@@ -54,11 +55,13 @@ from groupnest.db import get_db
 
 def test_create(client, auth, app):
 
-    client.post(
+    reponse = client.post(
         '/auth/login',
         data={'username': 'test', 'password': 'pbkdf2:sha256:50000$TCI4GzcX$0de171a4f4dac32e3364c7ddc7c14f3e2fa61f2d17574483f7ffbb431b4acb2f',
               'first_name': 'first', 'last_name': 'last', 'email': 'test@gmail.com', 'gender': 'FEMALE', 'description': 'good'}
     )
+
+    logging.info(response)
 
     # auth.login()
     response = client.get('/nest/11/create')

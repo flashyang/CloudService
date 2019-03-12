@@ -13,7 +13,7 @@ bp = Blueprint('reservation', __name__, url_prefix='/reservation')
 Create a new reservation in the given nest for login user.
 A user is not able to make a new reservation if he joined 5 nests.
 '''
-@bp.route('/create/nest_id/<int:nest_id>', methods=('POST',))
+@bp.route('/<int:nest_id>', methods=('POST',))
 @login_required
 def create(nest_id):
     nest = get_nest(nest_id)
@@ -118,7 +118,7 @@ def get_reservation(reservation_id, check_user=True):
 Accept offer (set accept offer = 1) when the nest is approved by landlord.
 If this is the last person accept offer, change the status of other nest to be rejected.
 '''    
-@bp.route('/<int:reservation_id>/accept_offer', methods=('POST',))
+@bp.route('/<int:reservation_id>', methods=('PUT',))
 @login_required
 def accept_offer(reservation_id):
     reservation = get_reservation(reservation_id)
@@ -163,7 +163,7 @@ Things to check:
 3. If the nest become empty after cancel the reservation, delete the nest as well.
    Else update the rest reservations in the nest to be accept_offer = 0
 '''
-@bp.route('/<int:reservation_id>/delete', methods=('POST',))
+@bp.route('/<int:reservation_id>', methods=('DELETE',))
 @login_required
 def delete(reservation_id):
     error = []

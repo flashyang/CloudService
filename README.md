@@ -1,6 +1,6 @@
-# CloudService
+# CloudService (Team SocialPig)
 
-· Language(s): Front end is React + Backend is Python 
+· Language(s): Front end is HTML + Backend is Python 
 		     
 · Frameworks: Flask
 

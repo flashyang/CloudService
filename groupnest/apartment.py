@@ -65,7 +65,6 @@ def search():
 
 # Get a apartment by apartmentId
 
-
 def get_apartment(apartmentId, check_user=True):
     apartment = get_db().execute(
         'SELECT *'
@@ -77,8 +76,8 @@ def get_apartment(apartmentId, check_user=True):
     if apartment is None:
         abort(404, "Apartment id {0} doesn't exist.".format(apartmentId))
 
-    if check_user and apartment['landlord_id'] != g.user['user_id']:
-        abort(403, "You can only modify your own apartment.")
+    # if check_user and apartment['landlord_id'] != g.user['user_id']:
+    #     abort(403, "You can only modify your own apartment.")
 
     return apartment
 
@@ -129,6 +128,8 @@ def delete(apartmentId):
 @login_required
 def update(apartmentId):
     apartment = get_apartment(apartmentId)
+    if apartmentId != g.user['user_id']:
+        abort(403, "You can only modify your own apartment.")
 
     if request.method == 'POST':
         name = request.form['name']
@@ -182,7 +183,7 @@ def create():
         error = None
 
         if not name:
-            error = 'title is required.'
+            error = 'name is required.'
         if not room_number:
             error = 'room number is required.'
         if not bathroom_number:
@@ -223,16 +224,14 @@ def browse(apartmentId):
     apt = get_apartment(apartmentId)
     if apt:
         item = {}
-        item['name'] = apt['name']
         item['room_number'] = apt['room_number']
         item['bathroom_number'] = apt['bathroom_number']
-        item['street_address'] = apt['street_address']
         item['zip'] = apt['zip']
+        item['street_address'] = apt['street_address']
         item['city'] = apt['city']
         item['state'] = apt['state']
-        item['price'] = apt['price']
-        item['sqft'] = apt['sqft']
-        item['description'] = apt['description']
+        item['name'] = apt['name']
+        item['landlord_id'] = apt['landlord_id']
 
         return jsonify(item)
     else:

@@ -38,8 +38,6 @@ def create(nest_id):
         flash(error)
         return error
 
-    # return redirect(url_for('nest.index'))
-
 '''
 Return the number of nests the user has joined in the given apartment.
 '''
@@ -118,7 +116,7 @@ def get_reservation(reservation_id, check_user=True):
 Accept offer (set accept offer = 1) when the nest is approved by landlord.
 If this is the last person accept offer, change the status of other nest to be rejected.
 '''    
-@bp.route('/<int:reservation_id>', methods=('PUT',))
+@bp.route('/<int:reservation_id>/accept_offer', methods=('PUT',))
 @login_required
 def accept_offer(reservation_id):
     reservation = get_reservation(reservation_id)
@@ -163,7 +161,7 @@ Things to check:
 3. If the nest become empty after cancel the reservation, delete the nest as well.
    Else update the rest reservations in the nest to be accept_offer = 0
 '''
-@bp.route('/<int:reservation_id>', methods=('DELETE',))
+@bp.route('/<int:reservation_id>/delete', methods=('DELETE',))
 @login_required
 def delete(reservation_id):
     error = []

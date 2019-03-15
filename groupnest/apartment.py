@@ -6,6 +6,7 @@ from werkzeug.exceptions import abort
 from groupnest.auth import login_required
 from groupnest.db import get_db
 
+import logging
 
 bp = Blueprint('apartment', __name__, url_prefix='/apartment')
 
@@ -20,7 +21,28 @@ def index():
         ' ORDER BY created DESC'
         ' LIMIT 10'
     ).fetchall()
-    return render_template('apartment/index.html', apartments=apartments)
+    result = []
+    if apartments:
+        for index in range(len(apartments)):
+            apt = apartments[index]
+            item = {}
+            item['name'] = apt['name']
+            item['room_number'] = apt['room_number']
+            item['bathroom_number'] = apt['bathroom_number']
+            item['street_address'] = apt['street_address']
+            item['zip'] = apt['zip']
+            item['city'] = apt['city']
+            item['state'] = apt['state']
+            item['price'] = apt['price']
+            item['sqft'] = apt['sqft']
+            item['description'] = apt['description']
+            item['photo_URL'] = apt['photo_URL']
+            result.append(item)
+        return jsonify(result)
+    else:
+        abort(404,
+              "No available apartment. Sorry! :(")
+
 
 # GET: /apartment/search (zipcode)
 # Get a list of apartments by searching zipcode
@@ -212,6 +234,7 @@ def create():
                  price, sqft, name, description, g.user['user_id'], photo_URL)
             )
             db.commit()
+
             return redirect(url_for('apartment.index'))
 
     return render_template('apartment/create.html')

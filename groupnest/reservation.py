@@ -13,7 +13,7 @@ bp = Blueprint('reservation', __name__, url_prefix='/reservation')
 Create a new reservation in the given nest for login user.
 A user is not able to make a new reservation if he joined 5 nests.
 '''
-@bp.route('/<int:nest_id>', methods=('POST',))
+@bp.route('/create/nest_id/<int:nest_id>', methods=('POST',))
 @login_required
 def create(nest_id):
     nest = get_nest(nest_id)
@@ -247,4 +247,3 @@ def all_accept_offer(nest_id):
         if r['accept_offer'] == 0:
             return False
     return True
-    

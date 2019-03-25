@@ -292,8 +292,6 @@ def get_ownerList():
         result.append(item)
     return jsonify(result)
 
-    # return "ownerList is in construction"
-    return jsonify(ownerList)
 
 # GET:/apartment/reserveList
 # Return a list of reservations in a given user id.

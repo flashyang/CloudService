@@ -33,7 +33,7 @@ export FLASK_APP=groupnest
 
 export FLASK_ENV=development
 
-flask init-db
+export DATABASE_URL=mysql://b4fda20e6f61ef:f9356ca7@us-cdbr-iron-east-03.cleardb.net/heroku_46f4b90a3346330
 
 flask run
 

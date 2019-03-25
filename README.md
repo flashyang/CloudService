@@ -15,7 +15,20 @@
 · API technology: REST
 
 
+# Set up clearDB (MySQL database) on Heroku
+```shell
+brew install heroku/brew/heroku
 
+heroku login
+
+heroku create
+
+heroku addons:create cleardb:ignite -a quiet-inlet-97604
+
+heroku config -a quiet-inlet-97604 | grep CLEARDB_DATABASE_URL
+
+pip install PyMySQL
+```
 
 
 
@@ -32,6 +45,8 @@ pip install -e .
 export FLASK_APP=groupnest
 
 export FLASK_ENV=development
+
+export DATABASE_URL=
 
 flask init-db
 

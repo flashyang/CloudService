@@ -1,11 +1,16 @@
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, url_for, jsonify
 )
+
+from werkzeug.contrib.cache import SimpleCache
+cache = SimpleCache()
+
 from werkzeug.exceptions import abort
 
 from groupnest.auth import login_required
 from groupnest.db import get_db
 
+import logging
 
 bp = Blueprint('apartment', __name__, url_prefix='/apartment')
 
@@ -20,7 +25,28 @@ def index():
         ' ORDER BY created DESC'
         ' LIMIT 10'
     ).fetchall()
-    return render_template('apartment/index.html', apartments=apartments)
+    result = []
+    if apartments:
+        for index in range(len(apartments)):
+            apt = apartments[index]
+            item = {}
+            item['name'] = apt['name']
+            item['room_number'] = apt['room_number']
+            item['bathroom_number'] = apt['bathroom_number']
+            item['street_address'] = apt['street_address']
+            item['zip'] = apt['zip']
+            item['city'] = apt['city']
+            item['state'] = apt['state']
+            item['price'] = apt['price']
+            item['sqft'] = apt['sqft']
+            item['description'] = apt['description']
+            item['photo_URL'] = apt['photo_URL']
+            result.append(item)
+        return jsonify(result)
+    else:
+        abort(404,
+              "No available apartment. Sorry! :(")
+
 
 # GET: /apartment/search (zipcode)
 # Get a list of apartments by searching zipcode
@@ -32,10 +58,14 @@ def search():
         error = None
         if not zip:
             error = 'ZipCode is required.'
+        StringZip = zip.str();
+        cacheZipResult = cache.get(StringZip)
 
         result = []
         if error is not None:
             flash(error)
+        elif cacheZipResult is not None:
+            return jsonify(cacheZipResult);
         else:
             apartments = db.execute(
                 'SELECT *'
@@ -57,14 +87,15 @@ def search():
                     item['price'] = apt['price']
                     item['sqft'] = apt['sqft']
                     result.append(item)
+                cache.set(StringZip, result, timeout=5 * 60)
                 return jsonify(result)
             else:
                 abort(404,
                       "No such apartment matching given zipcode exists in our databse. Sorry! :(")
     return redirect(url_for('apartment.index'))
 
-# Get a apartment by apartmentId
 
+# Get a apartment by apartmentId
 
 def get_apartment(apartmentId, check_user=True):
     apartment = get_db().execute(
@@ -77,8 +108,8 @@ def get_apartment(apartmentId, check_user=True):
     if apartment is None:
         abort(404, "Apartment id {0} doesn't exist.".format(apartmentId))
 
-    if check_user and apartment['landlord_id'] != g.user['user_id']:
-        abort(403, "You can only modify your own apartment.")
+    # if check_user and apartment['landlord_id'] != g.user['user_id']:
+    #     abort(403, "You can only modify your own apartment.")
 
     return apartment
 
@@ -129,6 +160,8 @@ def delete(apartmentId):
 @login_required
 def update(apartmentId):
     apartment = get_apartment(apartmentId)
+    if apartmentId != g.user['user_id']:
+        abort(403, "You can only modify your own apartment.")
 
     if request.method == 'POST':
         name = request.form['name']
@@ -144,24 +177,8 @@ def update(apartmentId):
         photo_URL = request.form['photo_URL']
         error = None
 
-        if not room_number:
-            error = 'room_number is required.'
-        if not bathroom_number:
-            error = 'bathroom_number is required.'
-        if not street_address:
-            error = 'street_address is required.'
-        if not city:
-            error = 'city is required.'
-        if not state:
-            error = 'state is required.'
-        if not zip:
-            error = 'zip is required.'
-        if not room_number:
-            error = 'room_number is required.'
-        if not price:
-            error = 'price is required.'
-        if not sqft:
-            error = 'sqft is required.'
+        if not name:
+            error = 'Name is required.'
 
         if error is not None:
             flash(error)
@@ -198,7 +215,7 @@ def create():
         error = None
 
         if not name:
-            error = 'title is required.'
+            error = 'name is required.'
         if not room_number:
             error = 'room number is required.'
         if not bathroom_number:
@@ -227,6 +244,7 @@ def create():
                  price, sqft, name, description, g.user['user_id'], photo_URL)
             )
             db.commit()
+
             return redirect(url_for('apartment.index'))
 
     return render_template('apartment/create.html')
@@ -239,21 +257,18 @@ def browse(apartmentId):
     apt = get_apartment(apartmentId)
     if apt:
         item = {}
-        item['name'] = apt['name']
         item['room_number'] = apt['room_number']
         item['bathroom_number'] = apt['bathroom_number']
-        item['street_address'] = apt['street_address']
         item['zip'] = apt['zip']
+        item['street_address'] = apt['street_address']
         item['city'] = apt['city']
         item['state'] = apt['state']
-        item['price'] = apt['price']
-        item['sqft'] = apt['sqft']
-        item['description'] = apt['description']
+        item['name'] = apt['name']
+        item['landlord_id'] = apt['landlord_id']
 
         return jsonify(item)
     else:
         abort(404, "Apartment id {0} doesn't exist.".format(apartmentId))
-
 
 # GET:/apartment/ownerList
 # Get the landload's apartments
@@ -262,7 +277,7 @@ def browse(apartmentId):
 def get_ownerList():
     db = get_db()
     ownerList = db.execute(
-        'SELECT a.name, a.street_address, a.price, username'
+        'SELECT a.name, a.street_address, a.price, username,room_number,bathroom_number,street_address,zip,city,state,price,sqft'
         ' FROM apartment a JOIN user u ON a.landlord_id = u.user_id'
         ' WHERE u.user_id = ?',
         (g.user['user_id'],)
@@ -283,7 +298,6 @@ def get_ownerList():
         item['state'] = apt['state']
         item['price'] = apt['price']
         item['sqft'] = apt['sqft']
-        item['description'] = apt['description']
         result.append(item)
     return jsonify(result)
 
@@ -291,30 +305,27 @@ def get_ownerList():
     return jsonify(ownerList)
 
 # GET:/apartment/reserveList
-# Get the user's reservations
-# TODO: may select different attributes by joinning theree tables----> SHOULD DISCUSS
+# Return a list of reservations in a given user id.
 @bp.route('/reserveList', methods=('GET',))
 @login_required
-def get_reserveList():
-    db = get_db()
-    reserveList = db.execute(
-        'SELECT r.nest_id,r.created,r.cancelled, username'
-        ' FROM reservation r JOIN user u ON r.tenant_id = u.user_id'
-        ' WHERE u.user_id = ?',
+def get_reservations():
+    reserveList = get_db().execute(
+        'SELECT reservation_id, r.nest_id, created, accept_offer'
+        ' FROM reservation r'
+        ' WHERE r.tenant_id = ?',
         (g.user['user_id'],)
     ).fetchall()
-    if not reserveList:
-        abort(404, "There is no reservations in your account:(")
+
+    if reserveList is None:
+        abort(404, "Nest id {0} doesn't exist or doesn't have reservations.".format(g.user['user_id']))
 
     result = []
     for index in range(len(reserveList)):
         apt = reserveList[index]
         item = {}
+        item['reservation_id'] = apt['reservation_id']
         item['nest_id'] = apt['nest_id']
         item['created'] = apt['created']
-        item['cancelled'] = apt['cancelled']
-        item['username'] = apt['username']
+        item['accept_offer'] = apt['accept_offer']
         result.append(item)
     return jsonify(result)
-    # return "reserveList is in construction"
-    return jsonify(reserveList)

@@ -10,7 +10,7 @@ import logging
 
 bp = Blueprint('apartment', __name__, url_prefix='/apartment')
 
-
+# master
 # GET: /apartment Return the index page
 @bp.route('/')
 def index():
@@ -86,6 +86,7 @@ def search():
     return redirect(url_for('apartment.index'))
 
 # Get a apartment by apartmentId
+
 
 def get_apartment(apartmentId, check_user=True):
     apartment = get_db().execute(
@@ -307,7 +308,8 @@ def get_reservations():
     ).fetchall()
 
     if reserveList is None:
-        abort(404, "Nest id {0} doesn't exist or doesn't have reservations.".format(g.user['user_id']))
+        abort(404, "Nest id {0} doesn't exist or doesn't have reservations.".format(
+            g.user['user_id']))
 
     result = []
     for index in range(len(reserveList)):

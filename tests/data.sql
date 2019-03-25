@@ -17,7 +17,7 @@ VALUES
 INSERT INTO apartment
   (room_number, bathroom_number, zip, street_address, city, state, name, landlord_id)
 VALUES
-  (2, 2, 98107, 'HAHA', 'Seattle', 'WA', 'apt1', 1),
+  (2, 2, 98107, 'HAHA', 'Seattle', 'WA', '11', 1),
   (2, 1, 98107, 'HAHA', 'Seattle', 'WA', 'apt2', 2),
   (2, 1, 98107, 'HAHA', 'Seattle', 'WA', 'apt3', 1);
 

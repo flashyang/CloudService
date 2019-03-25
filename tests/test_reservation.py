@@ -35,10 +35,13 @@ def test_create_validate(client, auth, path, message):
 def test_create(client, auth, app):
     with app.app_context():
         db = get_db()
-        prevCount = db.execute('SELECT COUNT(reservation_id) FROM reservation').fetchone()[0]
+        cursor = db.cursor()
+        cursor.execute('SELECT COUNT(reservation_id) FROM reservation')
+        prevCount = cursor.fetchone()['COUNT(reservation_id)']
         auth.login()
         client.post('reservation/create/nest_id/3', data={})
-        count = db.execute('SELECT COUNT(reservation_id) FROM reservation').fetchone()[0]
+        cursor.execute('SELECT COUNT(reservation_id) FROM reservation')
+        count = cursor.fetchone()['COUNT(reservation_id)']
         assert count == prevCount + 1
 
 @pytest.mark.parametrize(('path', 'message'), (
@@ -55,9 +58,12 @@ def test_accept_offer(client, auth, app):
 
     with app.app_context():
         db = get_db()
-        reservation = db.execute('SELECT * FROM reservation WHERE reservation_id = 1').fetchone()
+        cursor = db.cursor()
+        cursor.execute('SELECT * FROM reservation WHERE reservation_id = 1')
+        reservation = cursor.fetchone()
         assert reservation['accept_offer'] == 1
-        other_nest = db.execute('SELECT * FROM nest WHERE nest_id = 2').fetchone()
+        cursor.execute('SELECT * FROM nest WHERE nest_id = 2')
+        other_nest = cursor.fetchone()
         assert other_nest['status'] == 'REJECTED'
 
 @pytest.mark.parametrize(('path', 'message'), (
@@ -75,9 +81,12 @@ def test_delete(client, auth, app):
 
     with app.app_context():
         db = get_db()
-        reservation = db.execute('SELECT * FROM reservation WHERE reservation_id = 1').fetchone()
+        cursor = db.cursor()
+        cursor.execute('SELECT * FROM reservation WHERE reservation_id = 1')
+        reservation = cursor.fetchone()
         assert reservation is None
-        nest = db.execute('SELECT * FROM nest WHERE nest_id = 1').fetchone()
+        cursor.execute('SELECT * FROM nest WHERE nest_id = 1')
+        nest = cursor.fetchone()
         assert nest['status'] == 'PENDING'
 
 def test_delete_empty_nest(client, auth, app):
@@ -86,7 +95,10 @@ def test_delete_empty_nest(client, auth, app):
 
     with app.app_context():
         db = get_db()
-        reservation = db.execute('SELECT * FROM reservation WHERE reservation_id = 4').fetchone()
+        cursor = db.cursor()
+        cursor.execute('SELECT * FROM reservation WHERE reservation_id = 4')
+        reservation = cursor.fetchone()
         assert reservation is None
-        nest = db.execute('SELECT * FROM nest WHERE nest_id = 3').fetchone()
+        cursor.execute('SELECT * FROM nest WHERE nest_id = 3')
+        nest = cursor.fetchone()
         assert nest is None

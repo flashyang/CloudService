@@ -30,6 +30,7 @@ def test_nestUser(client, auth, app):
     assert 2 == data['room_number']
     assert 2 == data['user_number']
     assert 2 == len(data['user_list'])
+    print(data['user_list'])
     assert 'test' == data['user_list'][0]['username']
     assert 'other' == data['user_list'][1]['username']
 
@@ -80,15 +81,17 @@ def test_create(client, auth, app):
         response = client.post('/nest/2/create', data={})
         with app.app_context(), client:
             db = get_db()
+            cursor = db.cursor()
             client.get('/')
-            record = db.execute(
-                'SELECT DISTINCT n.nest_id'
-                ' FROM nest n JOIN reservation r ON n.nest_id = r.nest_id'
-                ' WHERE r.tenant_id = ?'
-                ' AND n.apartment_id = ?'
-                ' ORDER BY created DESC',
+            cursor.execute(
+                """SELECT DISTINCT n.nest_id
+                FROM nest n JOIN reservation r ON n.nest_id = r.nest_id
+                WHERE r.tenant_id = %s
+                AND n.apartment_id = %s""",
+                # ORDER BY created DESC""",
                 (g.user['user_id'], 2)
-            ).fetchall()
+            )
+            record = cursor.fetchall()
             len(record) == 2+i
 
         if i < 4:
@@ -116,8 +119,10 @@ def test_update(client, auth, app):
     assert b'Redirecting' in response.data
     with app.app_context():
         db = get_db()
-        nest = db.execute(
-            'SELECT status FROM nest WHERE nest_id = 1').fetchone()
+        cursor = db.cursor()
+        cursor.execute(
+            'SELECT status FROM nest WHERE nest_id = 1')
+        nest = cursor.fetchone()
         assert nest['status'] == 'APPROVED'
 
     response = client.post('/nest/1/update', data={'decision': 'REJECTED'})
@@ -131,9 +136,10 @@ def test_update(client, auth, app):
 
     with app.app_context():
         db = get_db()
-        db.execute(
-            'UPDATE nest SET status = ?'
-            ' WHERE nest_id = ?',
+        cursor = db.cursor()
+        cursor.execute(
+            """UPDATE nest SET status = %s
+            WHERE nest_id = %s""",
             ('PENDING', 1)
         )
         db.commit()

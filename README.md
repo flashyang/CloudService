@@ -33,7 +33,7 @@ export FLASK_APP=groupnest
 
 export FLASK_ENV=development
 
-flask init-db
+export DATABASE_URL=mysql://b4fda20e6f61ef:f9356ca7@us-cdbr-iron-east-03.cleardb.net/heroku_46f4b90a3346330
 
 flask run
 
@@ -66,3 +66,11 @@ git commit -m "something"
 git push -u 或者
 
 git push -u origin master
+
+TODO:
+1.	Facebook login - Stan
+2.	Jenkins pipeline - yang sun
+3.	Database - Qian
+4.	Cache - Can
+5.	Deploy NGix + WSGI – Yang Li
+

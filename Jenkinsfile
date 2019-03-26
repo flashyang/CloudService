@@ -18,22 +18,22 @@ pipeline {
                 sh 'pip install pytest coverage'
                 sh 'coverage run -m pytest'
             }
-            post {
-                always {
-                    // junit 'test-reports/results.xml'
-                }
-            }
+            // post {
+            //     always {
+            //         // junit 'test-reports/results.xml'
+            //     }
+            // }
         }
-        stage('Deliver') {
+        // stage('Deliver') {
         
-            steps {
-                // sh 'pyinstaller --onefile sources/add2vals.py'
-            }
-            post {
-                success {
-                    // archiveArtifacts 'dist/add2vals'
-                }
-            }
-        }
+        //     steps {
+        //         // sh 'pyinstaller --onefile sources/add2vals.py'
+        //     }
+        //     post {
+        //         success {
+        //             // archiveArtifacts 'dist/add2vals'
+        //         }
+        //     }
+        // }
     }
 }

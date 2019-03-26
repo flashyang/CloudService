@@ -50,7 +50,7 @@ def test_get_reserveNest(client, auth, app):
         if data['apartment_name'] == 'apt3':
             apt3_count + 1
     
-    assert apt1_count == 5
+    assert apt1_count == 0
     assert apt2_count == 1
     assert apt3_count == 0
 
@@ -62,7 +62,7 @@ def test_get_ownerNest(client, auth, app):
     assert 2 == len(data)
     assert 2 == len(data[0]['fullnest'])
     assert 4 == len(data[0]['notFullnest'])
-    assert 'apt1' == data[0]['apartment_name']
+    assert '11' == data[0]['apartment_name']
     assert 1 == len(data[1]['fullnest'])
     assert 0 == len(data[1]['notFullnest'])
     assert 'apt3' == data[1]['apartment_name']

@@ -10,7 +10,7 @@ import logging
 
 bp = Blueprint('apartment', __name__, url_prefix='/apartment')
 
-# master
+
 # GET: /apartment Return the index page
 @bp.route('/')
 def index():

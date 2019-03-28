@@ -3,7 +3,13 @@ import logging
 from flask import (
     Flask,Blueprint, flash, g, redirect, render_template, request, session, url_for, make_response, jsonify
 )
+from groupnest.db import get_db
 from flask_oauth import OAuth
+from requests_oauthlib import OAuth2Session
+from urllib.request import Request, urlopen, URLError
+import requests
+from groupnest.db import get_db
+
 
 GOOGLE_CLIENT_ID = '569147715346-hj17stsvc1m93e4nj3jjo5qt1g6csv21.apps.googleusercontent.com'
 GOOGLE_CLIENT_SECRET = 'k90emyx-vSVBe_uMy6FICkwu'
@@ -29,6 +35,8 @@ google = oauth.remote_app('google',
                           consumer_key=GOOGLE_CLIENT_ID,
                           consumer_secret=GOOGLE_CLIENT_SECRET)
 
+
+
 @bp.route('/auth')
 def index():
     access_token = session.get('access_token')
@@ -36,21 +44,32 @@ def index():
         return redirect(url_for('auth.login'))
 
     access_token = access_token[0]
-    from urllib2 import Request, urlopen, URLError
 
-    headers = {'Authorization': 'OAuth '+access_token}
-    req = Request('https://www.googleapis.com/oauth2/v1/userinfo',
-                  None, headers)
-    try:
-        res = urlopen(req)
-    except e:
-        if e.code == 401:
-            # Unauthorized - bad token
-            session.pop('access_token', None)
-            return redirect(url_for('auth.login'))
-        return res.read()
+    headers = {'Authorization': 'Bearer ' +access_token}
+                            
+    req = requests.get('https://www.googleapis.com/oauth2/v1/userinfo',
+                  headers = headers)
+    # print("What is in the req")
+    # print(req.status_code)
+    # print(req.json()['email'])
+    if not req.status_code is 200:
+        #Bad token, need to re-login
+        session.pop('access_token', None)
+        return redirect(url_for('auth.login'))
+    username = req.json()['email']
+    first_name = req.json()['given_name']
+    last_name = req.json()['family_name']
+    email = req.json()['email']
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute(
+                    'INSERT INTO user (username, first_name, last_name, email) VALUES (%s, %s, %s, %s)',
+                    (username, first_name, last_name, email)
+                )
+    db.commit()
+    logging.info('One user registered!')
+    return redirect(url_for('apartment.index'))
 
-    return res.read()
 
 
 @bp.route('/auth/login')
@@ -65,16 +84,21 @@ def login():
 def authorized(resp):
     access_token = resp['access_token']
     session['access_token'] = access_token, ''
-    return redirect(url_for('index'))
+    return redirect(url_for('apartment.index'))
 
 
 @google.tokengetter
 def get_access_token():
     return session.get('access_token')
 
+@bp.route('/auth/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('apartment.index'))
 
 if __name__ == '__main__':
-    app.run()
+   app.run()
+
 
 def login_required(view):
     @functools.wraps(view)
@@ -85,5 +109,6 @@ def login_required(view):
         return view(**kwargs)
 
     return wrapped_view
+
 
 

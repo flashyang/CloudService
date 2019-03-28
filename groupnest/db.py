@@ -1,17 +1,26 @@
-import sqlite3
-
 import click
 from flask import current_app, g
 from flask.cli import with_appcontext
-
+import pymysql
+import urllib
+import os
 
 def get_db():
     if 'db' not in g:
-        g.db = sqlite3.connect(
-            current_app.config['DATABASE'],
-            detect_types=sqlite3.PARSE_DECLTYPES
-        )
-        g.db.row_factory = sqlite3.Row
+        # url = urllib.parse.urlparse(os.environ['DATABASE_URL'])
+        conn = pymysql.connect(
+                current_app.config["DATABASE_HOSTNAME"],
+                current_app.config["DATABASE_USERNAME"],
+                current_app.config["DATABASE_PASSWORD"],
+                current_app.config["DATABASE_NAME"],
+                cursorclass=pymysql.cursors.DictCursor)
+
+        g.db =conn
+        # g.db = sqlite3.connect(
+        #     current_app.config['DATABASE'],
+        #     detect_types=sqlite3.PARSE_DECLTYPES
+        # )
+        # g.db.row_factory = sqlite3.Row
 
     return g.db
 
@@ -24,9 +33,16 @@ def close_db(e=None):
 
 def init_db():
     db = get_db()
+    with current_app.open_resource('schema.sql', 'r') as sqlfile:
+        ret = sqlfile.read().split(';')
+        # drop last empty entry
+        ret.pop()
+                
+        for stmt in ret:
+            db.cursor().execute(stmt + ";")
 
-    with current_app.open_resource('schema.sql') as f:
-        db.executescript(f.read().decode('utf8'))
+#     with current_app.open_resource('schema.sql') as f:
+#         db.executescript(f.read().decode('utf8'))
 
 
 @click.command('init-db')

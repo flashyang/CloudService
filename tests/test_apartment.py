@@ -9,8 +9,10 @@ def test_index(client, auth, app):
     client.get('/')
     with app.app_context():
         db = get_db()
-        apartment = db.execute(
-            'SELECT * FROM apartment ORDER BY created DESC LIMIT 10').fetchall()
+        cursor = db.cursor()
+        cursor.execute(
+            'SELECT * FROM apartment ORDER BY created DESC LIMIT 10')
+        apartment = cursor.fetchall()    
         assert apartment is not None
         assert apartment[0]['room_number'] == 2
         assert apartment[1]['zip'] == 98107
@@ -26,8 +28,12 @@ def test_search(client, auth, app):
 
 # TODO: May edit respson in apartment.py file then need to edit here
     response = client.post('/apartment/search', data={'zip': '98107'})
+<<<<<<< HEAD
     datas = json.loads(response.data)
     assert datas[0]['zip'] == 98107
+=======
+    assert b'"zip":98107' in response.data
+>>>>>>> 2c2cb216120b8082716bd7441e6e01dd00a80516
 
    # TODO: May edit here because orginally return a html
     response = client.get('/apartment/search', data={'zip': ''})
@@ -42,13 +48,17 @@ def test_delete_appartment(client, auth, app):
     client.post('/apartment/1/delete')
     with app.app_context():
         db = get_db()
-        apartment = db.execute(
-            'SELECT * FROM apartment WHERE apartment_id = 1').fetchone()
+        cursor = db.cursor()
+        cursor.execute(
+            'SELECT * FROM apartment WHERE apartment_id = 1')
+        apartment = cursor.fetchone()
         assert apartment is None
-        nest = db.execute('SELECT * FROM nest WHERE nest_id = 1').fetchall()
+        cursor.execute('SELECT * FROM nest WHERE nest_id = 1')
+        nest = cursor.fetchall()
         assert len(nest) == 0
-        reservation = db.execute(
-            'SELECT * FROM reservation WHERE reservation_id = 1').fetchall()
+        cursor.execute(
+            'SELECT * FROM reservation WHERE reservation_id = 1')
+        reservation = cursor.fetchall()
         assert len(reservation) == 0
 
 
@@ -70,8 +80,10 @@ def test_update_appartment(client, auth, app):
 
     with app.app_context():
         db = get_db()
-        apartment = db.execute(
-            'SELECT * FROM apartment WHERE apartment_id = 1').fetchone()
+        cursor = db.cursor()
+        cursor.execute(
+            'SELECT * FROM apartment WHERE apartment_id = 1')
+        apartment = cursor.fetchone()
         assert apartment['name'] == 'AAA'
 
 
@@ -91,8 +103,14 @@ def test_create(client, auth, app):
                                  'price': 2500, 'sqft': 2500, 'description': 'big good'})
     with app.app_context():
         db = get_db()
+<<<<<<< HEAD
         created = db.execute(
             'SELECT * FROM apartment WHERE apartment_id = 2').fetchone()
+=======
+        cursor = db.cursor()
+        cursor.execute('SELECT * FROM apartment WHERE apartment_id = 2')
+        created = cursor.fetchone()
+>>>>>>> 2c2cb216120b8082716bd7441e6e01dd00a80516
         assert created['zip'] == 98107
 
 

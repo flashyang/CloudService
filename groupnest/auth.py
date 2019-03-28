@@ -10,6 +10,9 @@ from urllib.request import Request, urlopen, URLError
 import requests
 from groupnest.db import get_db
 
+bp = Blueprint('auth', __name__, url_prefix='/auth')
+
+
 
 GOOGLE_CLIENT_ID = '569147715346-hj17stsvc1m93e4nj3jjo5qt1g6csv21.apps.googleusercontent.com'
 GOOGLE_CLIENT_SECRET = 'k90emyx-vSVBe_uMy6FICkwu'

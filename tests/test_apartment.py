@@ -29,7 +29,7 @@ def test_search(client, auth, app):
 
 # TODO: May edit respson in apartment.py file then need to edit here
     response = client.post('/apartment/search', data={'zip': '98107'})
-    assert b'"zip":98107' in response.data
+    assert b'"zip": 98107' in response.data
 
    # TODO: May edit here because orginally return a html
     response = client.get('/apartment/search', data={'zip': ''})

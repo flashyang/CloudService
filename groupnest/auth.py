@@ -97,7 +97,7 @@ def index():
         print(user)
         logging.info('One user registered!')
     session['user_id'] = user['user_id']
-    return render_template('apartment/index.html')
+    return redirect(url_for('apartment.index'))
 
 
 
@@ -113,7 +113,7 @@ def login():
 def authorized(resp):
     access_token = resp['access_token']
     session['access_token'] = access_token, ''
-    return redirect(url_for('apartment.index'))
+    return redirect(url_for('auth.index'))
 
 
 @google.tokengetter

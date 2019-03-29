@@ -243,7 +243,7 @@ def create():
 
             return redirect(url_for('apartment.index'))
 
-    return render_template('apartment/index.html')
+    return render_template('apartment/create.html')
 
 
 # GET:  /apartment/<int: apartmentId>/browse

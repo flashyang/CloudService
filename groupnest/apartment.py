@@ -122,12 +122,21 @@ def get_nests(apartmentId):
 
 # DELETE: /apartment/<int: apartmentId>/delete
 # Delete all the apartment data including nest and reservations for giving apartmentId.
-@bp.route('/<int:apartmentId>/delete', methods=('POST',))
+@bp.route('/<int:apartmentId>/delete', methods=('POST','GET'))
 @login_required
 def delete(apartmentId):
     nestList = get_nests(apartmentId)
     db = get_db()
     cursor = db.cursor()
+    cursor.execute(
+        'SELECT landlord_id'
+        ' FROM apartment'
+        ' WHERE apartment_id = %s',
+        (apartmentId,)
+    )
+    landlordId = cursor.fetchone()['landlord_id']
+    if landlordId != g.user['user_id']:
+        abort(403, "You can only delete your own apartment.")
     if nestList is not None:
         for nest in nestList:
             nestId = nest['nest_id']
@@ -223,6 +232,7 @@ def create():
         else:
             db = get_db()
             cursor = db.cursor()
+            #Store apartment inforamtion
             cursor.execute(
                 'INSERT INTO apartment (room_number, bathroom_number, street_address, city,state,zip ,price,sqft,name,description,landlord_id, photo_URL)'
                 ' VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)',
@@ -233,7 +243,7 @@ def create():
 
             return redirect(url_for('apartment.index'))
 
-    return render_template('apartment/create.html')
+    return render_template('apartment/index.html')
 
 
 # GET:  /apartment/<int: apartmentId>/browse

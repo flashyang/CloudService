@@ -10,7 +10,7 @@ from urllib.request import Request, urlopen, URLError
 import requests
 from groupnest.db import get_db
 
-bp = Blueprint('auth', __name__, url_prefix='/auth')
+bp = Blueprint('auth', __name__)
 
 
 
@@ -38,7 +38,18 @@ google = oauth.remote_app('google',
                           consumer_key=GOOGLE_CLIENT_ID,
                           consumer_secret=GOOGLE_CLIENT_SECRET)
 
+@bp.before_app_request
+def load_logged_in_user():
+    user_id = session.get('user_id')
+    cursor = get_db().cursor()
 
+    if user_id is None:
+        g.user = None
+    else:
+        cursor.execute(
+            'SELECT * FROM user WHERE user_id = %s', (user_id,)
+        )
+        g.user = cursor.fetchone()
 
 @bp.route('/auth')
 def index():
@@ -52,26 +63,41 @@ def index():
                             
     req = requests.get('https://www.googleapis.com/oauth2/v1/userinfo',
                   headers = headers)
-    # print("What is in the req")
-    # print(req.status_code)
-    # print(req.json()['email'])
+    print("What is in the req")
+    print(req.status_code)
+    print(req.json())
     if not req.status_code is 200:
         #Bad token, need to re-login
         session.pop('access_token', None)
         return redirect(url_for('auth.login'))
+    print("**************")
     username = req.json()['email']
     first_name = req.json()['given_name']
     last_name = req.json()['family_name']
     email = req.json()['email']
     db = get_db()
     cursor = db.cursor()
-    cursor.execute(
-                    'INSERT INTO user (username, first_name, last_name, email) VALUES (%s, %s, %s, %s)',
-                    (username, first_name, last_name, email)
-                )
-    db.commit()
-    logging.info('One user registered!')
-    return redirect(url_for('apartment.index'))
+    cursor.execute('SELECT * FROM user WHERE username= %s', (email,))
+    user = cursor.fetchone()
+    # store the user id in a new session and return to the index
+    session.clear()
+    print("Look at this user:")
+    print(user)
+    # session['user_id'] = user['user_id']
+    if user is None:
+        cursor.execute(
+            'INSERT INTO user (username, first_name, last_name, email)'
+            ' VALUES(%s, %s, %s,%s)',
+            (username, first_name, last_name, email)
+        )
+        db.commit()
+        cursor.execute('SELECT * FROM user WHERE username= %s', (email,))
+        user = cursor.fetchone()
+        print("One user registered!")
+        print(user)
+        logging.info('One user registered!')
+    session['user_id'] = user['user_id']
+    return render_template('apartment/index.html')
 
 
 
@@ -99,14 +125,15 @@ def logout():
     session.clear()
     return redirect(url_for('apartment.index'))
 
-if __name__ == '__main__':
-   app.run()
+# if __name__ == '__main__':
+#    app.run()
 
 
 def login_required(view):
     @functools.wraps(view)
     def wrapped_view(**kwargs):
         if g.user is None:
+            print("No user")
             return redirect(url_for('auth.login'))
 
         return view(**kwargs)

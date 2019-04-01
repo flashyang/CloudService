@@ -98,7 +98,17 @@ node {
     runCmd('export DATABASE_URL=mysql://b4fda20e6f61ef:f9356ca7@us-cdbr-iron-east-03.cleardb.net/heroku_46f4b90a3346330')
     runCmd('coverage run -m pytest')
     runCmd('python -m coverage xml -o reports/coverage.xml')
-
+    runCmd('step([$class: 'CoberturaPublisher',
+        autoUpdateHealth: false,
+        autoUpdateStability: false,
+        coberturaReportFile: 'reports/coverage.xml',
+        failNoReports: false,
+        failUnhealthy: false,
+        failUnstable: false,
+        maxNumberOfBuilds: 10,
+        onlyStable: false,
+        sourceEncoding: 'ASCII',
+        zoomCoverageChart: false])')
      
 
     stage 'Build package'
@@ -137,3 +147,5 @@ def runCmd(String pyCmd){
         sh returnStatus: true, script: "vex --path=${env.VENV_PATH} ${pyCmd}"
     }
 }
+
+

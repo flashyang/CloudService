@@ -98,7 +98,8 @@ node {
     runCmd('export DATABASE_URL=mysql://b4fda20e6f61ef:f9356ca7@us-cdbr-iron-east-03.cleardb.net/heroku_46f4b90a3346330')
     runCmd('coverage run -m pytest')
     runCmd('python -m coverage xml -o reports/coverage.xml')
-    runCmd('step([$class: 'CoberturaPublisher',
+    
+    step([$class: 'CoberturaPublisher',
         autoUpdateHealth: false,
         autoUpdateStability: false,
         coberturaReportFile: 'reports/coverage.xml',
@@ -108,7 +109,7 @@ node {
         maxNumberOfBuilds: 10,
         onlyStable: false,
         sourceEncoding: 'ASCII',
-        zoomCoverageChart: false])')
+        zoomCoverageChart: false])
      
 
     stage 'Build package'

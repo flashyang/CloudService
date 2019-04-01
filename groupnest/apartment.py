@@ -15,12 +15,15 @@ bp = Blueprint('apartment', __name__, url_prefix='/apartment')
 @bp.route('/')
 def index():
     db = get_db()
-    apartments = db.execute(
+    cursor = db.cursor()
+    cursor.execute(
         'SELECT *'
         ' FROM apartment'
         ' ORDER BY created DESC'
         ' LIMIT 10'
-    ).fetchall()
+    )
+    apartments = cursor.fetchall()
+    
     result = []
     if apartments:
         for index in range(len(apartments)):
@@ -49,6 +52,7 @@ def index():
 @bp.route('/search', methods=('GET', 'POST'))
 def search():
     db = get_db()
+    cursor = db.cursor()
     if request.method == 'POST':
         zip = request.form['zip']
         error = None
@@ -59,27 +63,29 @@ def search():
         if error is not None:
             flash(error)
         else:
-            apartments = db.execute(
+            cursor.execute(
                 'SELECT *'
                 ' FROM apartment'
-                ' WHERE zip = ?'
+                ' WHERE zip = %s'
                 ' ORDER BY created DESC',
                 (zip,)
-            ).fetchall()
+            )
+            apartments = cursor.fetchall()
             if apartments:
-                for index in range(len(apartments)):
-                    apt = apartments[index]
-                    item = {}
-                    item['name'] = apt['name']
-                    item['room_number'] = apt['room_number']
-                    item['bathroom_number'] = apt['bathroom_number']
-                    item['zip'] = apt['zip']
-                    item['city'] = apt['city']
-                    item['state'] = apt['state']
-                    item['price'] = apt['price']
-                    item['sqft'] = apt['sqft']
-                    result.append(item)
-                return jsonify(result)
+                # for index in range(len(apartments)):
+                #     apt = apartments[index]
+                #     item = {}
+                #     item['name'] = apt['name']
+                #     item['room_number'] = apt['room_number']
+                #     item['bathroom_number'] = apt['bathroom_number']
+                #     item['zip'] = apt['zip']
+                #     item['city'] = apt['city']
+                #     item['state'] = apt['state']
+                #     item['price'] = apt['price']
+                #     item['sqft'] = apt['sqft']
+                #     result.append(item)
+                # return jsonify(result)
+                return jsonify(apartments)
             else:
                 abort(404,
                       "No such apartment matching given zipcode exists in our databse. Sorry! :(")
@@ -88,12 +94,15 @@ def search():
 # Get a apartment by apartmentId
 
 def get_apartment(apartmentId, check_user=True):
-    apartment = get_db().execute(
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute(
         'SELECT *'
         ' FROM apartment'
-        ' WHERE apartment_id = ?',
+        ' WHERE apartment_id = %s',
         (apartmentId,)
-    ).fetchone()
+    )
+    apartment = cursor.fetchone()
 
     if apartment is None:
         abort(404, "Apartment id {0} doesn't exist.".format(apartmentId))
@@ -108,22 +117,27 @@ def get_apartment(apartmentId, check_user=True):
 
 
 def get_nests(apartmentId):
+
+    db = get_db()
+    cursor = db.cursor()
     # check if the given apartmentId is valid
-    apartment = get_db().execute(
+    cursor.execute(
         'SELECT name'
         ' FROM apartment'
-        ' WHERE apartment_id = ?',
+        ' WHERE apartment_id = %s',
         (apartmentId,)
-    ).fetchall()
+    )
+    apartment = cursor.fetchall()
     if len(apartment) == 0:
         abort(404, "Apartment id {0} doesn't exist.".format(id))
 
-    nestList = get_db().execute(
+    cursor.execute(
         'SELECT *'
         ' FROM nest'
-        ' WHERE apartment_id = ?',
+        ' WHERE apartment_id = %s',
         (apartmentId,)
-    ).fetchall()
+    )
+    nestList = cursor.fetchall()
 
     return nestList
 
@@ -134,12 +148,13 @@ def get_nests(apartmentId):
 def delete(apartmentId):
     nestList = get_nests(apartmentId)
     db = get_db()
+    cursor = db.cursor()
     if nestList is not None:
         for nest in nestList:
             nestId = nest['nest_id']
-            db.execute('DELETE FROM reservation WHERE nest_id = ?', (nestId,))
-    db.execute('DELETE FROM nest WHERE apartment_id = ?', (apartmentId,))
-    db.execute('DELETE FROM apartment WHERE apartment_id = ?', (apartmentId,))
+            cursor.execute('DELETE FROM reservation WHERE nest_id = %s', (nestId,))
+    cursor.execute('DELETE FROM nest WHERE apartment_id = %s', (apartmentId,))
+    cursor.execute('DELETE FROM apartment WHERE apartment_id = %s', (apartmentId,))
     db.commit()
     return redirect(url_for('apartment.index'))
 
@@ -174,9 +189,10 @@ def update(apartmentId):
             flash(error)
         else:
             db = get_db()
-            db.execute(
-                'UPDATE apartment SET name = ?, room_number = ?, bathroom_number = ? , street_address = ?,  city = ?, state = ?, zip = ?, price = ?, sqft = ?, description = ?, photo_URL = ?'
-                ' WHERE apartment_id = ?',
+            cursor = db.cursor()
+            cursor.execute(
+                'UPDATE apartment SET name = %s, room_number = %s, bathroom_number = %s, street_address = %s,  city = %s, state = %s, zip = %s, price = %s, sqft = %s, description = %s, photo_URL = %s'
+                ' WHERE apartment_id = %s',
                 (name, room_number, bathroom_number, street_address, city,
                  state, zip, price, sqft, description, photo_URL, apartmentId)
             )
@@ -227,9 +243,10 @@ def create():
             flash(error)
         else:
             db = get_db()
-            db.execute(
+            cursor = db.cursor()
+            cursor.execute(
                 'INSERT INTO apartment (room_number, bathroom_number, street_address, city,state,zip ,price,sqft,name,description,landlord_id, photo_URL)'
-                ' VALUES (?, ?, ?,?,?, ?, ?,?,?,?,?,?)',
+                ' VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)',
                 (room_number, bathroom_number, street_address, city, state, zip,
                  price, sqft, name, description, g.user['user_id'], photo_URL)
             )
@@ -266,12 +283,14 @@ def browse(apartmentId):
 @login_required
 def get_ownerList():
     db = get_db()
-    ownerList = db.execute(
+    cursor = db.cursor()
+    cursor.execute(
         'SELECT a.name, a.street_address, a.price, username,room_number,bathroom_number,street_address,zip,city,state,price,sqft'
         ' FROM apartment a JOIN user u ON a.landlord_id = u.user_id'
-        ' WHERE u.user_id = ?',
+        ' WHERE u.user_id = %s',
         (g.user['user_id'],)
-    ).fetchall()
+    )
+    ownerList = cursor.fetchall()
     if not ownerList:
         abort(404, "There is no apartments in your account:(")
 
@@ -299,12 +318,15 @@ def get_ownerList():
 @bp.route('/reserveList', methods=('GET',))
 @login_required
 def get_reservations():
-    reserveList = get_db().execute(
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute(
         'SELECT reservation_id, r.nest_id, created, accept_offer'
         ' FROM reservation r'
-        ' WHERE r.tenant_id = ?',
+        ' WHERE r.tenant_id = %s',
         (g.user['user_id'],)
-    ).fetchall()
+    )
+    reserveList = cursor.fetchall()
 
     if reserveList is None:
         abort(404, "Nest id {0} doesn't exist or doesn't have reservations.".format(g.user['user_id']))

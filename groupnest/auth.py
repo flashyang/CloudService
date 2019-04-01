@@ -23,21 +23,22 @@ def register():
         description = request.form['description']
 
         db = get_db()
+        cursor = db.cursor()
         error = None
 
         if not username:
             error = 'Username is required.'
         elif not password:
             error = 'Password is required.'
-        elif db.execute(
-            'SELECT user_id FROM user WHERE username = ?', (username,)
-        ).fetchone() is not None:
-            error = 'User {} is already registered.'.format(username)
+        else:
+            cursor.execute('SELECT user_id FROM user WHERE username= %s', (username,))
+            if cursor.fetchone() is not None:
+                error = 'User {} is already registered.'.format(username)
 
         if error is None:
             try:
-                db.execute(
-                    'INSERT INTO user (username, password, first_name, last_name, email, gender, description) VALUES (?, ?, ?, ?, ?, ?, ?)',
+                cursor.execute(
+                    'INSERT INTO user (username, password, first_name, last_name, email, gender, description) VALUES (%s, %s, %s, %s, %s, %s, %s)',
                     (username, generate_password_hash(password),
                      first_name, last_name, email, gender, description)
                 )
@@ -58,10 +59,12 @@ def login():
         username = request.form['username']
         password = request.form['password']
         db = get_db()
+        cursor = db.cursor()
         error = None
-        user = db.execute(
-            'SELECT * FROM user WHERE username = ?', (username,)
-        ).fetchone()
+        cursor.execute(
+            'SELECT * FROM user WHERE username = %s', (username,)
+        )
+        user = cursor.fetchone()
 
         if user is None:
             error = 'Incorrect username.'
@@ -87,13 +90,15 @@ def logout():
 @bp.before_app_request
 def load_logged_in_user():
     user_id = session.get('user_id')
+    cursor = get_db().cursor()
 
     if user_id is None:
         g.user = None
     else:
-        g.user = get_db().execute(
-            'SELECT * FROM user WHERE user_id = ?', (user_id,)
-        ).fetchone()
+        cursor.execute(
+            'SELECT * FROM user WHERE user_id = %s', (user_id,)
+        )
+        g.user = cursor.fetchone()
     print(user_id)
 
 

@@ -1,5 +1,6 @@
 import os
 import tempfile
+import urllib
 
 import pytest
 from groupnest import create_app
@@ -11,21 +12,33 @@ with open(os.path.join(os.path.dirname(__file__), 'data.sql'), 'rb') as f:
 
 @pytest.fixture
 def app():
-    db_fd, db_path = tempfile.mkstemp()
-
     app = create_app({
         'TESTING': True,
-        'DATABASE': db_path,
+        # 'DATABASE': db_path,
     })
+
+    app.config["DATABASE_HOSTNAME"] = "localhost"
+    app.config["DATABASE_USERNAME"] = "root"
+    app.config["DATABASE_PASSWORD"] = ""
+    app.config["DATABASE_NAME"]     = "groupnestdatabase"
 
     with app.app_context():
         init_db()
-        get_db().executescript(_data_sql)
+        db = get_db()
+        # get_db().executescript(_data_sql)
+
+        ret = _data_sql.split(';')
+        # drop last empty entry
+        ret.pop()
+                
+        for stmt in ret:
+            db.cursor().execute(stmt + ";")
+        db.commit()
 
     yield app
 
-    os.close(db_fd)
-    os.unlink(db_path)
+    # os.close(db_fd)
+    # os.unlink(db_path)
 
 
 @pytest.fixture

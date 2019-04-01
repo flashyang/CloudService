@@ -99,17 +99,7 @@ node {
     runCmd('coverage run -m pytest')
     runCmd('python -m coverage xml -o reports/coverage.xml')
 
-    runCmd('step([$class: 'CoberturaPublisher',
-        autoUpdateHealth: false,
-        autoUpdateStability: false,
-        coberturaReportFile: 'reports/coverage.xml',
-        failNoReports: false,
-        failUnhealthy: false,
-        failUnstable: false,
-        maxNumberOfBuilds: 10,
-        onlyStable: false,
-        sourceEncoding: 'ASCII',
-        zoomCoverageChart: false])')
+    
      
 
     stage 'Build package'

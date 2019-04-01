@@ -6,8 +6,6 @@ from groupnest.db import get_db
 
 def test_index(client, auth, app):
     response = client.get('/')
-    assert b"Log In" in response.data
-    assert b"Register" in response.data
     auth.login()
     response = client.get('/')
     with app.app_context():
@@ -17,6 +15,8 @@ def test_index(client, auth, app):
             'SELECT * FROM apartment ORDER BY created DESC LIMIT 10')
         apartment = cursor.fetchall()    
         assert apartment is not None
+        assert apartment[0]['room_number'] == 2
+        assert apartment[1]['zip'] == 98107
 
 
 def test_search(client, auth, app):
@@ -29,7 +29,8 @@ def test_search(client, auth, app):
 
 # TODO: May edit respson in apartment.py file then need to edit here
     response = client.post('/apartment/search', data={'zip': '98107'})
-    assert b'"zip": 98107' in response.data
+    datas = json.loads(response.data)
+    assert datas[0]['zip'] == 98107
 
    # TODO: May edit here because orginally return a html
     response = client.get('/apartment/search', data={'zip': ''})

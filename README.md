@@ -1,6 +1,6 @@
-# CloudService
+# CloudService (Team SocialPig)
 
-· Language(s): Front end is React + Backend is Python 
+· Language(s): Front end is HTML + Backend is Python 
 		     
 · Frameworks: Flask
 
@@ -81,3 +81,11 @@ git commit -m "something"
 git push -u 或者
 
 git push -u origin master
+
+TODO:
+1.	Google login - Stan
+2.	Jenkins pipeline - yang sun
+3.	Database - Qian
+4.	Cache - Can
+5.	Deploy NGix + WSGI – Yang Li
+

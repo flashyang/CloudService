@@ -99,7 +99,7 @@ node {
     runCmd('coverage run -m pytest')
     runCmd('python -m coverage xml -o reports/coverage.xml')
 
-    runCmd(junit allowEmptyResults: true, testResults: 'test-reports/results.xml', fingerprint: true)
+     
 
     stage 'Build package'
     runCmd('python setup.py bdist_wheel')

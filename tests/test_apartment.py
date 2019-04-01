@@ -104,6 +104,7 @@ def test_create(client, auth, app):
     with app.app_context():
         db = get_db()
 <<<<<<< HEAD
+<<<<<<< HEAD
         created = db.execute(
             'SELECT * FROM apartment WHERE apartment_id = 2').fetchone()
 =======
@@ -111,6 +112,11 @@ def test_create(client, auth, app):
         cursor.execute('SELECT * FROM apartment WHERE apartment_id = 2')
         created = cursor.fetchone()
 >>>>>>> 2c2cb216120b8082716bd7441e6e01dd00a80516
+=======
+        cursor = db.cursor()
+        cursor.execute('SELECT * FROM apartment WHERE apartment_id = 2')
+        created = cursor.fetchone()
+>>>>>>> 8fcaca8797d8d5d800f785e39658fe128f49e381
         assert created['zip'] == 98107
 
 

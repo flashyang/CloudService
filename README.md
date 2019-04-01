@@ -83,7 +83,7 @@ git push -u 或者
 git push -u origin master
 
 TODO:
-1.	Facebook login - Stan
+1.	Google login - Stan
 2.	Jenkins pipeline - yang sun
 3.	Database - Qian
 4.	Cache - Can

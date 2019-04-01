@@ -98,8 +98,8 @@ node {
     runCmd('export DATABASE_URL=mysql://b4fda20e6f61ef:f9356ca7@us-cdbr-iron-east-03.cleardb.net/heroku_46f4b90a3346330')
     runCmd('coverage run -m pytest')
     runCmd('python -m coverage xml -o reports/coverage.xml')
-    
-    step([$class: 'CoberturaPublisher',
+
+    runCmd('step([$class: 'CoberturaPublisher',
         autoUpdateHealth: false,
         autoUpdateStability: false,
         coberturaReportFile: 'reports/coverage.xml',
@@ -109,7 +109,7 @@ node {
         maxNumberOfBuilds: 10,
         onlyStable: false,
         sourceEncoding: 'ASCII',
-        zoomCoverageChart: false])
+        zoomCoverageChart: false])')
      
 
     stage 'Build package'
@@ -139,13 +139,13 @@ def virtualEnv(String rebuild){
             sh "rm -rf ${env.VENV_PATH}"
             sh "echo 'rebuild is true'"
         }
-        sh returnStatus: true, script: "virtualenv ${env.VENV_PATH}"
+        sh "returnStatus: true, script: 'virtualenv ${env.VENV_PATH}'"
     }
 }
 
 def runCmd(String pyCmd){
     withEnv(["PATH+VEX=~/.local/bin"]){
-        sh returnStatus: true, script: "vex --path=${env.VENV_PATH} ${pyCmd}"
+        sh "returnStatus: true, script: 'vex --path=${env.VENV_PATH} ${pyCmd}'"
     }
 }
 

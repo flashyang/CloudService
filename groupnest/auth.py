@@ -63,14 +63,10 @@ def index():
                             
     req = requests.get('https://www.googleapis.com/oauth2/v1/userinfo',
                   headers = headers)
-    print("What is in the req")
-    print(req.status_code)
-    print(req.json())
     if not req.status_code is 200:
         #Bad token, need to re-login
         session.pop('access_token', None)
         return redirect(url_for('auth.login'))
-    print("**************")
     username = req.json()['email']
     first_name = req.json()['given_name']
     last_name = req.json()['family_name']
@@ -81,8 +77,6 @@ def index():
     user = cursor.fetchone()
     # store the user id in a new session and return to the index
     session.clear()
-    print("Look at this user:")
-    print(user)
     # session['user_id'] = user['user_id']
     if user is None:
         cursor.execute(
@@ -93,8 +87,6 @@ def index():
         db.commit()
         cursor.execute('SELECT * FROM user WHERE username= %s', (email,))
         user = cursor.fetchone()
-        print("One user registered!")
-        print(user)
         logging.info('One user registered!')
     session['user_id'] = user['user_id']
     return redirect(url_for('apartment.index'))

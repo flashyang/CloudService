@@ -126,19 +126,40 @@ pipeline {
                 extensions: [[$class: 'RelativeTargetDirectory',
                 relativeTargetDir: './${BUILD_NUMBER}']],
                 submoduleCfg: [], userRemoteConfigs:
-                [[credentialsId: 'Git_Cred', url: 'https://github.com/flashyang/CloudService.git']]])
+                [[credentialsId: 'git', url: 'https://github.com/flashyang/CloudService.git']]])
                 }
         }
         stage('Tests') {
+            environment {
+                FLASK_APP=groupnest
+                FLASK_ENV=development
+                DATABASE_URL=mysql://b4fda20e6f61ef:f9356ca7@us-cdbr-iron-east-03.cleardb.net/heroku_46f4b90a3346330
+            }
             steps {
 
 		        dir("${WORKSPACE}/${BUILD_NUMBER}"){
 		            sh """
 		                echo $PYTHONPATH
 		                pip3 install -r "./requirements.txt"
-		                python3 -m pytest --cov=main ${workspace_path}/test/
+                        coverage run ${workspace_path}/tests/
+                        python -m coverage xml -o reports/coverage.xml
 		            """
 		        }
+            }
+             post{
+                always{
+                    step([$class: 'CoberturaPublisher',
+                                   autoUpdateHealth: false,
+                                   autoUpdateStability: false,
+                                   coberturaReportFile: 'reports/coverage.xml',
+                                   failNoReports: false,
+                                   failUnhealthy: false,
+                                   failUnstable: false,
+                                   maxNumberOfBuilds: 10,
+                                   onlyStable: false,
+                                   sourceEncoding: 'ASCII',
+                                   zoomCoverageChart: false])
+                }
             }
         }
     }

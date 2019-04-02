@@ -43,7 +43,7 @@
 
 node {
     stage 'Checkout and Build' 
-    
+    sh 'pip install virtualenv'
     createVirtualEnv 'env'
     executeIn 'env', 'pip install -r requirements.txt'
 
@@ -89,7 +89,7 @@ node {
 
 // one of the workaround
 def createVirtualEnv(String name) {
-    sh "python3 -m venv ${name}"
+    sh "virtualenv ${name}"
 }
  
 def executeIn(String environment, String script) {

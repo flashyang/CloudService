@@ -126,7 +126,7 @@ pipeline {
                 extensions: [[$class: 'RelativeTargetDirectory',
                 relativeTargetDir: './${BUILD_NUMBER}']],
                 submoduleCfg: [], userRemoteConfigs:
-                [[credentialsId: 'git', url: 'https://github.com/flashyang/CloudService.git']]])
+                [[credentialsId: 'GIT_CRED', url: 'https://github.com/flashyang/CloudService.git']]])
                 }
         }
         stage('Tests') {

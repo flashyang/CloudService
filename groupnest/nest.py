@@ -51,21 +51,24 @@ def get_allNest(apartmentId):
 def get_nests(apartmentId):
     # check if the given apartmentId is valid
     db = get_db()
-    apartment = db.execute(
-        'SELECT name'
-        ' FROM apartment'
-        ' WHERE apartment_id = ?',
+    cursor = db.cursor()
+    cursor.execute(
+        """SELECT name
+        FROM apartment
+        WHERE apartment_id = %s""",
         (apartmentId,)
-    ).fetchall()
+    )
+    apartment = cursor.fetchall()
     if len(apartment) == 0:
         abort(404, "Apartment id {0} doesn't exist.".format(id))
 
-    nestList = db.execute(
-        'SELECT *'
-        ' FROM nest'
-        ' WHERE apartment_id = ?',
+    cursor.execute(
+        """SELECT *
+        FROM nest
+        WHERE apartment_id = %s""",
         (apartmentId,)
-    ).fetchall()
+    )
+    nestList = cursor.fetchall()
 
     return nestList
 
@@ -124,12 +127,14 @@ def nestTwoNumber(nestId):
 # Given nestId, get the associated apartment
 def get_apartment(nestId):
     db = get_db()
-    apartment = db.execute(
-        'SELECT name, room_number, n.apartment_id'
-        ' FROM apartment p JOIN nest n ON p.apartment_id = n.apartment_id'
-        ' WHERE n.nest_id = ?',
+    cursor = db.cursor()
+    cursor.execute(
+        """SELECT name, room_number, n.apartment_id
+        FROM apartment p JOIN nest n ON p.apartment_id = n.apartment_id
+        WHERE n.nest_id = %s""",
         (nestId,)
-    ).fetchone()
+    )
+    apartment = cursor.fetchone()
     return apartment
 
 
@@ -137,18 +142,20 @@ def get_apartment(nestId):
 # gender, description)
 def get_nestUser(nestId):
     db = get_db()
-    users = db.execute(
-        'SELECT username, first_name, last_name, email, gender, description'
-        ' FROM reservation p JOIN user u ON p.tenant_id = u.user_id'
-        ' WHERE p.nest_id = ?'
-        # ' AND p.cancelled = 0'
-        ' ORDER BY created DESC',
+    cursor = db.cursor()
+    cursor.execute(
+        """SELECT username, first_name, last_name, email, gender, description
+        FROM reservation p JOIN user u ON p.tenant_id = u.user_id
+        WHERE p.nest_id = %s
+        ORDER BY created DESC""",
         (nestId,)
-    ).fetchall()
-    columns = ['username', 'first_name', 'last_name', 'email', 'gender', 'description']
+    )
+    users = cursor.fetchall()
+    # columns = ['username', 'first_name', 'last_name', 'email', 'gender', 'description']
     res = []
     for user in users:
-        res.append(dict(zip(columns, user)))
+        # res.append(dict(zip(columns, user)))
+        res.append(user)
     return res
 
 
@@ -174,29 +181,33 @@ def nestUser(nestId):
 @login_required
 def get_reserveNest():
     db = get_db()
-    reservation_list = db.execute(
-        'SELECT nest_id, accept_offer'
-        ' FROM reservation'
-        ' WHERE tenant_id = ?'
-        ' ORDER BY created DESC',
+    cursor = db.cursor()
+    cursor.execute(
+        """SELECT nest_id, accept_offer
+        FROM reservation
+        WHERE tenant_id = %s
+        ORDER BY created DESC""",
         (g.user['user_id'],)
-    ).fetchall()
+    )
+    reservation_list = cursor.fetchall()
     result = []
     for index in range(len(reservation_list)):
         reservation = reservation_list[index]
         nest_id = reservation['nest_id']
-        nest = db.execute(
-            'SELECT apartment_id, status'
-            ' FROM nest'
-            ' WHERE nest_id = ?',
+        cursor.execute(
+            """SELECT apartment_id, status
+            FROM nest
+            WHERE nest_id = %s""",
             (nest_id,)
-        ).fetchone()
-        apartment = db.execute(
-            'SELECT name'
-            ' FROM apartment'
-            ' WHERE apartment_id = ?',
+        )
+        nest = cursor.fetchone()
+        cursor.execute(
+            """SELECT name
+            FROM apartment
+            WHERE apartment_id = %s""",
             (nest['apartment_id'],)
-        ).fetchone()
+        )
+        apartment = cursor.fetchone()
         res = nestTwoNumber(nest_id)
         item = {}
         item['room_number'] = res['room_number']
@@ -217,13 +228,15 @@ def get_reserveNest():
 def get_ownerNest():
     result = []
     db = get_db()
-    apartment_list = db.execute(
-        'SELECT apartment_id, name'
-        ' FROM apartment'
-        ' WHERE landlord_id = ?'
-        ' ORDER BY created DESC',
+    cursor = db.cursor()
+    cursor.execute(
+        """SELECT apartment_id, name
+        FROM apartment
+        WHERE landlord_id = %s
+        ORDER BY created DESC""",
         (g.user['user_id'],)
-    ).fetchall()
+    )
+    apartment_list = cursor.fetchall()
     for index in range(len(apartment_list)):
         apartment = apartment_list[index]
         item = {}
@@ -241,12 +254,14 @@ def get_ownerNest():
 def create(apartmentId):
     # check if the given apartmentId exists
     db = get_db()
-    apartment = db.execute(
-        'SELECT *'
-        ' FROM apartment'
-        ' WHERE apartment_id = ?',
+    cursor = db.cursor()
+    cursor.execute(
+        """SELECT *
+        FROM apartment
+        WHERE apartment_id = %s""",
         (apartmentId,)
-    ).fetchone()
+    )
+    apartment = cursor.fetchone()
 
     logging.info('fetch apartment with Id %s', apartmentId)
 
@@ -263,14 +278,15 @@ def create(apartmentId):
     if request.method == 'POST':
 
         # check if the user has been added to five nests associated with the given apartment
-        record = db.execute(
-            'SELECT DISTINCT n.nest_id'
-            ' FROM nest n JOIN reservation r ON n.nest_id = r.nest_id'
-            ' WHERE r.tenant_id = ?'
-            ' AND n.apartment_id = ?'
-            ' ORDER BY created DESC',
+        cursor.execute(
+            """SELECT DISTINCT n.nest_id
+            FROM nest n JOIN reservation r ON n.nest_id = r.nest_id
+            WHERE r.tenant_id = %s
+            AND n.apartment_id = %s""",
+            # ORDER BY created DESC""",
             (g.user['user_id'], apartmentId)
-        ).fetchall()
+        )
+        record = cursor.fetchall()
 
         logging.info(
             'user has been added in %s nests for this apartment', len(record))
@@ -282,17 +298,18 @@ def create(apartmentId):
 
             abort(403, 'User has already been added to five nests belong to this apartment. Please cancal the previous reservation and create a new nest again.')
         else:
-            nest_id = db.execute(
+            cursor.execute(
                 'INSERT INTO nest (apartment_id)'
-                ' VALUES (?)',
+                ' VALUES (%s)',
                 (apartmentId,)
-            ).lastrowid
+            )
+            nest_id = cursor.lastrowid
 
             logging.info('nest with id %s created', nest_id)
 
-            db.execute(
-                'INSERT INTO reservation (nest_id, tenant_id)'
-                ' VALUES (?, ?)',
+            cursor.execute(
+                """INSERT INTO reservation (nest_id, tenant_id)
+                VALUES (%s, %s)""",
                 (nest_id, g.user['user_id'])
             )
             db.commit()
@@ -311,13 +328,15 @@ def create(apartmentId):
 @login_required
 def update(nestId):
     db = get_db()
+    cursor = db.cursor()
     # check if the current nestId exists and the nest status is PENDING
-    cur_nest = db.execute(
-        'SELECT status'
-        ' FROM nest'
-        ' WHERE nest_id = ?',
+    cursor.execute(
+        """SELECT status
+        FROM nest
+        WHERE nest_id = %s""",
         (nestId,)
-    ).fetchone()
+    )
+    cur_nest = cursor.fetchone()
 
     logging.info('fetch nest with Id %s', nestId)
 
@@ -339,12 +358,13 @@ def update(nestId):
             abort(403, 'Cannot change nest status that is not PENDING')
 
         # check if current user is the landlord of the apartment associated with the nest with the given nest_id
-        owner = db.execute(
-            'SELECT landlord_id'
-            ' FROM apartment a JOIN nest n ON a.apartment_id = n.apartment_id'
-            ' WHERE n.nest_id = ?',
+        cursor.execute(
+            """SELECT landlord_id
+            FROM apartment a JOIN nest n ON a.apartment_id = n.apartment_id
+            WHERE n.nest_id = %s""",
             (nestId,)
-        ).fetchone()
+        )
+        owner = cursor.fetchone()
         if owner['landlord_id'] != g.user['user_id']:
             error = 'Current user is not authorized to alter the status of this nest.'
             logging.error('current user id is %s, not equal to the landloard id %s',
@@ -353,13 +373,15 @@ def update(nestId):
 
         # check if the landlord has already approved a nest
         apartment = get_apartment(nestId)
-        approved_nest = db.execute(
-            'SELECT *'
-            ' FROM nest n'
-            ' WHERE n.apartment_id = ?'
-            ' AND status = ?',
+        cursor.execute(
+            """SELECT *
+            FROM nest n
+            WHERE n.apartment_id = %s
+            AND status = %s""",
             (apartment['apartment_id'], 'APPROVED')
-        ).fetchall()
+        )
+        approved_nest = cursor.fetchall()
+
         if len(approved_nest) != 0 and request.form['decision'] == 'APPROVED':
             error = 'Landlord has already approved one nest'
             logging.error(error)
@@ -376,9 +398,9 @@ def update(nestId):
         # if error is not None:
         #     return error
         # else:
-        db.execute(
-            'UPDATE nest SET status = ?'
-            ' WHERE nest_id = ?',
+        cursor.execute(
+            """UPDATE nest SET status = %s
+            WHERE nest_id = %s""",
             (decision, nestId)
         )
         db.commit()

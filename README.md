@@ -15,7 +15,20 @@
 · API technology: REST
 
 
+# Set up clearDB (MySQL database) on Heroku
+```shell
+brew install heroku/brew/heroku
 
+heroku login
+
+heroku create
+
+heroku addons:create cleardb:ignite -a quiet-inlet-97604
+
+heroku config -a quiet-inlet-97604 | grep CLEARDB_DATABASE_URL
+
+pip install PyMySQL
+```
 
 
 
@@ -34,6 +47,8 @@ export FLASK_APP=groupnest
 export FLASK_ENV=development
 
 export DATABASE_URL=mysql://b4fda20e6f61ef:f9356ca7@us-cdbr-iron-east-03.cleardb.net/heroku_46f4b90a3346330
+
+flask init-db
 
 flask run
 
@@ -68,7 +83,7 @@ git push -u 或者
 git push -u origin master
 
 TODO:
-1.	Facebook login - Stan
+1.	Google login - Stan
 2.	Jenkins pipeline - yang sun
 3.	Database - Qian
 4.	Cache - Can

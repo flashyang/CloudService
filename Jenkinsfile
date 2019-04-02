@@ -141,25 +141,9 @@ pipeline {
 		            sh """
 		                echo $PYTHONPATH
 		                pip3 install -r "./requirements.txt"
-                        coverage run ${workspace_path}/tests/
-                        python -m coverage xml -o reports/coverage.xml
+                        python3 -m pytest --cov=main ${workspace_path}/tests/
 		            """
 		        }
-            }
-             post{
-                always{
-                    step([$class: 'CoberturaPublisher',
-                                   autoUpdateHealth: false,
-                                   autoUpdateStability: false,
-                                   coberturaReportFile: 'reports/coverage.xml',
-                                   failNoReports: false,
-                                   failUnhealthy: false,
-                                   failUnstable: false,
-                                   maxNumberOfBuilds: 10,
-                                   onlyStable: false,
-                                   sourceEncoding: 'ASCII',
-                                   zoomCoverageChart: false])
-                }
             }
         }
     }

@@ -89,7 +89,7 @@ node {
 
 // one of the workaround
 def createVirtualEnv(String name) {
-    sh "virtualenv ${name}"
+    sh "python3 -m venv ${name}"
 }
  
 def executeIn(String environment, String script) {

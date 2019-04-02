@@ -38,46 +38,9 @@
 //     }
 // }
 
-// pipeline {
-//     agent none
-//     stages {
-//         stage('Build') {
-//             environment 
-//             steps {
-                
-//                 sh 'python3 -m venv venv'
-//                 sh '. venv/bin/activate'
-//                 sh 'pip install -e .'
-//             }
-//         }
-//         stage('Test') {
-//             environment {
-//                 FLASK_APP='groupnest'
-//                 FLASK_ENV='development'
-//                 DATABASE_URL='mysql://b4fda20e6f61ef:f9356ca7@us-cdbr-iron-east-03.cleardb.net/heroku_46f4b90a3346330'
-//             }
-//             steps {
-//                 sh 'coverage run -m pytest'
-//             }
-//             // post {
-//             //     always {
-//             //         // junit 'test-reports/results.xml'
-//             //     }
-//             // }
-//         }
-//         // stage('Deliver') {
-        
-//         //     steps {
-//         //         // sh 'pyinstaller --onefile sources/add2vals.py'
-//         //     }
-//         //     post {
-//         //         success {
-//         //             // archiveArtifacts 'dist/add2vals'
-//         //         }
-//         //     }
-//         // }
-//     }
-// }
+
+
+
 
 
 node {
@@ -124,7 +87,7 @@ def executeIn(String environment, String script) {
 env.VENV_PATH = "${JENKINS_HOME}/.virtualenv/${JOB_NAME}/venv"
 
 def virtualEnv(String rebuild){
-    withEnv(["PATH+VEX=~/.local/bin"]){
+    withEnv(["PATH=~/.local/bin"]){
         if(rebuild == "true") {
             sh "rm -rf ${env.VENV_PATH}"
             sh "echo 'rebuild is true'"
@@ -134,8 +97,8 @@ def virtualEnv(String rebuild){
 }
 
 def runCmd(String pyCmd){
-    withEnv(["PATH+VEX=~/.local/bin"]){
-        sh returnStatus: true, script: "vex --path=${env.VENV_PATH} ${pyCmd}"
+    withEnv(["PATH=~/.local/bin"]){
+        sh returnStatus: true, script: "--path=${env.VENV_PATH} ${pyCmd}"
     }
 }
 

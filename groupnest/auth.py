@@ -3,18 +3,12 @@ import logging
 from flask import (
     Flask,Blueprint, flash, g, redirect, render_template, request, session, url_for, make_response, jsonify
 )
-<<<<<<< HEAD
-from werkzeug.security import check_password_hash, generate_password_hash
-
-from groupnest.db import get_db 
-=======
 from groupnest.db import get_db
 from flask_oauth import OAuth
 from requests_oauthlib import OAuth2Session
 from urllib.request import Request, urlopen, URLError
 import requests
 from groupnest.db import get_db
->>>>>>> 35312839513b4425cd696122f3bd68ea30fd4675
 
 bp = Blueprint('auth', __name__)
 

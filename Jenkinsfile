@@ -140,7 +140,7 @@ pipeline {
 		        dir("${WORKSPACE}/${BUILD_NUMBER}"){
 		            sh """
 		                echo $PYTHONPATH
-		                pip3 install -r "./requirements.txt"
+		                pip install -r "./requirements.txt"
                         python3 -m pytest --cov=main ${workspace_path}/tests/
 		            """
 		        }

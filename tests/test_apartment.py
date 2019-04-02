@@ -28,12 +28,7 @@ def test_search(client, auth, app):
 
 # TODO: May edit respson in apartment.py file then need to edit here
     response = client.post('/apartment/search', data={'zip': '98107'})
-<<<<<<< HEAD
-    datas = json.loads(response.data)
-    assert datas[0]['zip'] == 98107
-=======
     assert b'"zip":98107' in response.data
->>>>>>> 2c2cb216120b8082716bd7441e6e01dd00a80516
 
    # TODO: May edit here because orginally return a html
     response = client.get('/apartment/search', data={'zip': ''})
@@ -103,20 +98,9 @@ def test_create(client, auth, app):
                                  'price': 2500, 'sqft': 2500, 'description': 'big good'})
     with app.app_context():
         db = get_db()
-<<<<<<< HEAD
-<<<<<<< HEAD
-        created = db.execute(
-            'SELECT * FROM apartment WHERE apartment_id = 2').fetchone()
-=======
         cursor = db.cursor()
         cursor.execute('SELECT * FROM apartment WHERE apartment_id = 2')
         created = cursor.fetchone()
->>>>>>> 2c2cb216120b8082716bd7441e6e01dd00a80516
-=======
-        cursor = db.cursor()
-        cursor.execute('SELECT * FROM apartment WHERE apartment_id = 2')
-        created = cursor.fetchone()
->>>>>>> 8fcaca8797d8d5d800f785e39658fe128f49e381
         assert created['zip'] == 98107
 
 

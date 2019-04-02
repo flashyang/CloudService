@@ -43,7 +43,7 @@
 
 node {
     stage 'Checkout and Build' 
-    sh 'pip install virtualenv'
+    sh 'sudo easy_install pip; pip install virtualenv'
     createVirtualEnv 'env'
     executeIn 'env', 'pip install -r requirements.txt'
 

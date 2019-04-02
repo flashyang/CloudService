@@ -54,7 +54,7 @@ node {
 
     executeIn 'env', 'coverage run -m pytest'
     executeIn 'env', 'python -m coverage xml -o reports/coverage.xml'
-    executeIn 'env', 'step([$class: 'CoberturaPublisher', autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: 'reports/coverage.xml', failNoReports: false, failUnhealthy: false, failUnstable: false, maxNumberOfBuilds: 10, onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false])'
+    // executeIn 'env', 'step([$class: 'CoberturaPublisher', autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: 'reports/coverage.xml', failNoReports: false, failUnhealthy: false, failUnstable: false, maxNumberOfBuilds: 10, onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false])'
 
     stage 'Build package'
     executeIn 'env', 'python setup.py bdist_wheel'

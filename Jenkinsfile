@@ -87,7 +87,7 @@ def executeIn(String environment, String script) {
 env.VENV_PATH = "${JENKINS_HOME}/.virtualenv/${JOB_NAME}/venv"
 
 def virtualEnv(String rebuild){
-    withEnv(["PATH=~/.local/bin"]){
+    withEnv(["PATH+VEX=~/.local/bin"]){
         if(rebuild == "true") {
             sh "rm -rf ${env.VENV_PATH}"
             sh "echo 'rebuild is true'"
@@ -97,8 +97,8 @@ def virtualEnv(String rebuild){
 }
 
 def runCmd(String pyCmd){
-    withEnv(["PATH=~/.local/bin"]){
-        sh returnStatus: true, script: "--path=${env.VENV_PATH} ${pyCmd}"
+    withEnv(["PATH+VEX=~/.local/bin"]){
+        sh returnStatus: true, script: "vex --path=${env.VENV_PATH} ${pyCmd}"
     }
 }
 

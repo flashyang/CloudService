@@ -5,7 +5,6 @@ from groupnest.db import get_db
 
 
 def test_index(client, auth, app):
-    auth.login()
     client.get('/')
     with app.app_context():
         db = get_db()
@@ -28,7 +27,7 @@ def test_search(client, auth, app):
 
 # TODO: May edit respson in apartment.py file then need to edit here
     response = client.post('/apartment/search', data={'zip': '98107'})
-    assert b'"zip":98107' in response.data
+    assert b'"zip": 98107' in response.data
 
    # TODO: May edit here because orginally return a html
     response = client.get('/apartment/search', data={'zip': ''})
@@ -36,7 +35,7 @@ def test_search(client, auth, app):
 
 
 def test_delete_appartment(client, auth, app):
-    auth.login()
+    # auth.login()
     assert client.post('/apartment/7/delete').status_code == 404
     response = client.post('/apartment/9/delete')
     assert b'doesn\'t exist.' in response.data
@@ -58,7 +57,7 @@ def test_delete_appartment(client, auth, app):
 
 
 def test_update_appartment(client, auth, app):
-    auth.login()
+    # auth.login()
 
     response = client.get('/apartment/2/update')
     assert b'Are you sure?' in response.data
@@ -81,7 +80,7 @@ def test_update_appartment(client, auth, app):
 
 
 def test_create(client, auth, app):
-    auth.login()
+    # auth.login()
     assert client.get('/apartment/create').status_code == 200
     response = client.post('/apartment/create', data={'name': '',
                                                       'room_number': 5,
@@ -123,7 +122,7 @@ def test_browse(client, auth, app):
 
 
 def test_get_ownerList(client, auth, app):
-    auth.login()
+    # auth.login()
     response = client.get('/apartment/ownerList')
     assert response.status_code == 200
     datas = json.loads(response.data)
@@ -131,7 +130,7 @@ def test_get_ownerList(client, auth, app):
 
 
 def test_get_reservationList(client, auth, app):
-        auth.login()
+        # auth.login()
         response = client.get('/apartment/reserveList')
         assert response.status_code == 200
         datas = json.loads(response.data)

@@ -8,7 +8,6 @@ from flask_oauth import OAuth
 from requests_oauthlib import OAuth2Session
 from urllib.request import Request, urlopen, URLError
 import requests
-from groupnest.db import get_db
 
 bp = Blueprint('auth', __name__)
 

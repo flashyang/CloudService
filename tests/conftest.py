@@ -3,6 +3,7 @@ import tempfile
 import urllib
 
 import pytest
+from flask import g, session
 from groupnest import create_app
 from groupnest.db import get_db, init_db
 
@@ -19,7 +20,6 @@ def app():
 
     app.config["DATABASE_HOSTNAME"] = "localhost"
     app.config["DATABASE_USERNAME"] = "root"
-    app.config["DATABASE_PASSWORD"] = ""
     app.config["DATABASE_NAME"]     = "groupnestdatabase"
 
     with app.app_context():
@@ -55,15 +55,22 @@ class AuthActions(object):
     def __init__(self, client):
         self._client = client
 
-    def login(self, username='test', password='test', first_name='first', last_name='last', email='test@gmail.com', gender='FEMALE', description='good'):
-        return self._client.post(
-            '/auth/login',
-            data={'username': username, 'password': password, 'first_name': first_name,
-                  'last_name': last_name, 'email': email, 'gender': gender, 'description': description}
+    def login(username='test', first_name='first', last_name='last', email='test@gmail.com'):
+        cursor = db.cursor()
+        cursor.execute(
+            'SELECT user_id'
+            ' FROM user'
+            ' WHERE username = %s',
+            (username,)
         )
+        session.clear()
+        userID = cursor.fetchone()['user_id']
+        session['user_id'] = user['user_id']
+        return true
 
     def logout(self):
-        return self._client.get('/auth/logout')
+        session.clear()
+        return false
 
 
 @pytest.fixture

@@ -7,9 +7,8 @@ import urllib
 
 def create_app(test_config=None):
 
-    # create a logging configuration
     from logging.config import dictConfig
-
+    # create a logging configuration
     dictConfig({
         'version': 1,
         'formatters': {'default': {

@@ -3,11 +3,13 @@ import tempfile
 import urllib
 
 import pytest
+from flask import g, session
 from groupnest import create_app
 from groupnest.db import get_db, init_db
 
 with open(os.path.join(os.path.dirname(__file__), 'data.sql'), 'rb') as f:
     _data_sql = f.read().decode('utf8')
+
 
 
 @pytest.fixture
@@ -17,10 +19,12 @@ def app():
         # 'DATABASE': db_path,
     })
 
-    app.config["DATABASE_HOSTNAME"] = "localhost"
-    app.config["DATABASE_USERNAME"] = "root"
-    app.config["DATABASE_PASSWORD"] = ""
-    app.config["DATABASE_NAME"]     = "groupnestdatabase"
+    
+    url = urllib.parse.urlparse(os.environ['TEST_DATABASE_URL'])
+    app.config["DATABASE_HOSTNAME"] = url.hostname
+    app.config["DATABASE_USERNAME"] = url.username
+    app.config["DATABASE_PASSWORD"] = url.password
+    app.config["DATABASE_NAME"]     = url.path[1:]
 
     with app.app_context():
         init_db()
@@ -30,7 +34,7 @@ def app():
         ret = _data_sql.split(';')
         # drop last empty entry
         ret.pop()
-                
+
         for stmt in ret:
             db.cursor().execute(stmt + ";")
         db.commit()
@@ -55,15 +59,23 @@ class AuthActions(object):
     def __init__(self, client):
         self._client = client
 
-    def login(self, username='test', password='test', first_name='first', last_name='last', email='test@gmail.com', gender='FEMALE', description='good'):
-        return self._client.post(
-            '/auth/login',
-            data={'username': username, 'password': password, 'first_name': first_name,
-                  'last_name': last_name, 'email': email, 'gender': gender, 'description': description}
+    def login(username='test', first_name='first', last_name='last', email='test@gmail.com'):
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute(
+            'SELECT user_id'
+            ' FROM user'
+            ' WHERE username = %s',
+            (username,)
         )
+        session.clear()
+        userID = cursor.fetchone()['user_id']
+        session['user_id'] = user['user_id']
+        return true
 
     def logout(self):
-        return self._client.get('/auth/logout')
+        session.clear()
+        return false
 
 
 @pytest.fixture

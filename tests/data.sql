@@ -17,32 +17,32 @@ VALUES
 INSERT INTO apartment
   (room_number, bathroom_number, zip, street_address, city, state, name, landlord_id)
 VALUES
-  (2, 2, 98107, 'HAHA', 'Seattle', 'WA', 'apt1', 1),
-  (2, 1, 98107, 'HAHA', 'Seattle', 'WA', 'apt2', 2),
-  (2, 1, 98107, 'HAHA', 'Seattle', 'WA', 'apt3', 1);
+  (2, 2, 98107, 'HAHA', 'Seattle', 'WA', 'apt1', 2),
+  (2, 1, 98107, 'HAHA', 'Seattle', 'WA', 'apt2', 12),
+  (2, 1, 98107, 'HAHA', 'Seattle', 'WA', 'apt3', 2);
 
 INSERT INTO nest
   (apartment_id, status)
 VALUES
-  (1, 'APPROVED'),
-  (1, 'PENDING'),
+  (2, 'APPROVED'),
   (2, 'PENDING'),
-  (1, 'PENDING'),
-  (1, 'PENDING'),
-  (1, 'PENDING'),
-  (1, 'PENDING'),
-  (3, 'PENDING');
+  (12, 'PENDING'),
+  (2, 'PENDING'),
+  (2, 'PENDING'),
+  (2, 'PENDING'),
+  (2, 'PENDING'),
+  (22, 'PENDING');
 
 INSERT INTO reservation
   (nest_id, tenant_id, accept_offer)
 VALUES
-  (1, 1, 0),
-  (1, 2, 1),
   (2, 2, 0),
-  (3, 1, 0),
-  (2, 1, 0),
-  (4, 1, 0),
-  (5, 1, 0),
-  (6, 1, 0),
-  (8, 1, 0),
-  (8, 1, 0);
+  (2, 12, 1),
+  (12, 12, 0),
+  (22, 2, 0),
+  (12, 2, 0),
+  (32, 2, 0),
+  (42, 2, 0),
+  (52, 2, 0),
+  (72, 2, 0),
+  (72, 2, 0);

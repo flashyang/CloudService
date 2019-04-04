@@ -30,7 +30,7 @@ def app():
         ret = _data_sql.split(';')
         # drop last empty entry
         ret.pop()
-                
+
         for stmt in ret:
             db.cursor().execute(stmt + ";")
         db.commit()

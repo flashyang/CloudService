@@ -6,7 +6,6 @@ DROP TABLE IF EXISTS user;
 CREATE TABLE user (
 user_id	INT PRIMARY KEY AUTO_INCREMENT,
 username VARCHAR(255) UNIQUE NOT NULL,
-password VARCHAR(255) NOT NULL,
 first_name VARCHAR(255),
 last_name VARCHAR(255),
 email VARCHAR(255),
@@ -49,9 +48,6 @@ accept_offer INT NOT NULL DEFAULT 0,
 FOREIGN KEY (nest_id) REFERENCES nest (nest_id),
 FOREIGN KEY (tenant_id) REFERENCES user (user_id)
 );
-
-
-  	  
 
   
 

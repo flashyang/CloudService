@@ -2,6 +2,7 @@ import os
 import urllib
 
 from flask import Flask
+import urllib
 
 
 def create_app(test_config=None):
@@ -30,6 +31,11 @@ def create_app(test_config=None):
         SECRET_KEY='dev',
         DATABASE=os.path.join(app.instance_path, 'groupnest.sqlite'),
     )
+    url = urllib.parse.urlparse(os.environ['DATABASE_URL'])
+    app.config["DATABASE_HOSTNAME"] = url.hostname
+    app.config["DATABASE_USERNAME"] = url.username
+    app.config["DATABASE_PASSWORD"] = url.password
+    app.config["DATABASE_NAME"]     = url.path[1:]
 
     url = urllib.parse.urlparse(os.environ['DATABASE_URL'])
     app.config["DATABASE_HOSTNAME"] = url.hostname

@@ -23,29 +23,7 @@ def index():
         ' LIMIT 10'
     )
     apartments = cursor.fetchall()
-    
-    result = []
-    if apartments:
-        for index in range(len(apartments)):
-            apt = apartments[index]
-            item = {}
-            item['name'] = apt['name']
-            item['room_number'] = apt['room_number']
-            item['bathroom_number'] = apt['bathroom_number']
-            item['street_address'] = apt['street_address']
-            item['zip'] = apt['zip']
-            item['city'] = apt['city']
-            item['state'] = apt['state']
-            item['price'] = apt['price']
-            item['sqft'] = apt['sqft']
-            item['description'] = apt['description']
-            item['photo_URL'] = apt['photo_URL']
-            result.append(item)
-        return jsonify(result)
-    else:
-        abort(404,
-              "No available apartment. Sorry! :(")
-
+    return jsonify(apartments)
 
 # GET: /apartment/search (zipcode)
 # Get a list of apartments by searching zipcode
@@ -92,6 +70,7 @@ def search():
     return redirect(url_for('apartment.index'))
 
 # Get a apartment by apartmentId
+
 
 def get_apartment(apartmentId, check_user=True):
     db = get_db()
@@ -143,12 +122,21 @@ def get_nests(apartmentId):
 
 # DELETE: /apartment/<int: apartmentId>/delete
 # Delete all the apartment data including nest and reservations for giving apartmentId.
-@bp.route('/<int:apartmentId>/delete', methods=('POST',))
+@bp.route('/<int:apartmentId>/delete', methods=('POST','GET'))
 @login_required
 def delete(apartmentId):
     nestList = get_nests(apartmentId)
     db = get_db()
     cursor = db.cursor()
+    cursor.execute(
+        'SELECT landlord_id'
+        ' FROM apartment'
+        ' WHERE apartment_id = %s',
+        (apartmentId,)
+    )
+    landlordId = cursor.fetchone()['landlord_id']
+    if landlordId != g.user['user_id']:
+        abort(403, "You can only delete your own apartment.")
     if nestList is not None:
         for nest in nestList:
             nestId = nest['nest_id']
@@ -244,6 +232,7 @@ def create():
         else:
             db = get_db()
             cursor = db.cursor()
+            #Store apartment inforamtion
             cursor.execute(
                 'INSERT INTO apartment (room_number, bathroom_number, street_address, city,state,zip ,price,sqft,name,description,landlord_id, photo_URL)'
                 ' VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)',
@@ -310,8 +299,6 @@ def get_ownerList():
         result.append(item)
     return jsonify(result)
 
-    # return "ownerList is in construction"
-    return jsonify(ownerList)
 
 # GET:/apartment/reserveList
 # Return a list of reservations in a given user id.
@@ -329,7 +316,8 @@ def get_reservations():
     reserveList = cursor.fetchall()
 
     if reserveList is None:
-        abort(404, "Nest id {0} doesn't exist or doesn't have reservations.".format(g.user['user_id']))
+        abort(404, "Nest id {0} doesn't exist or doesn't have reservations.".format(
+            g.user['user_id']))
 
     result = []
     for index in range(len(reserveList)):

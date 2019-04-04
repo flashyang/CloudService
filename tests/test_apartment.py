@@ -5,9 +5,8 @@ from groupnest.db import get_db
 
 
 def test_index(client, auth, app):
-    response = client.get('/')
     auth.login()
-    response = client.get('/')
+    client.get('/')
     with app.app_context():
         db = get_db()
         cursor = db.cursor()
@@ -29,8 +28,7 @@ def test_search(client, auth, app):
 
 # TODO: May edit respson in apartment.py file then need to edit here
     response = client.post('/apartment/search', data={'zip': '98107'})
-    datas = json.loads(response.data)
-    assert datas[0]['zip'] == 98107
+    assert b'"zip":98107' in response.data
 
    # TODO: May edit here because orginally return a html
     response = client.get('/apartment/search', data={'zip': ''})
@@ -72,7 +70,7 @@ def test_update_appartment(client, auth, app):
 
     response = client.post('/apartment/2/update', data={'name': 'AAA', 'room_number': '2', 'bathroom_number':'2', 'zip':'98107', 'street_address':'HAHA', 'city':'Seattle', 'state':'WA', 'price':'1000','sqft':'200', 'description':'','photo_URL':''})
     assert b'Redirecting' in response.data
-   
+
     with app.app_context():
         db = get_db()
         cursor = db.cursor()
@@ -82,28 +80,29 @@ def test_update_appartment(client, auth, app):
         assert apartment['name'] == 'AAA'
 
 
-
 def test_create(client, auth, app):
     auth.login()
     assert client.get('/apartment/create').status_code == 200
     response = client.post('/apartment/create', data={'name': '',
-                                            'room_number': 5,
-                                            'bathroom_number':5,
-                                 'street_address':'225 terry ave n', 'city':'seattle', 'state':'WA', 'zip':98115,
-                                 'price': 250, 'sqft':3500, 'description':'big good','photo_URL':''})
+                                                      'room_number': 5,
+                                                      'bathroom_number': 5,
+                                                      'street_address': '225 terry ave n', 'city': 'seattle', 'state': 'WA', 'zip': 98115,
+                                                      'price': 250, 'sqft': 3500, 'description': 'big good', 'photo_URL': ''})
     assert response.status_code == 200
     assert b'name is required.' in response.data
 
-
-    client.post('/create', data={'name': 'apartment1', 'room_number': 5, 'bathroom_number':5,
-                                 'street_address':'225 terry ave n', 'city':'seattle', 'state':'WA', 'zip':98115,
-                                 'price': 2500, 'sqft':2500, 'description':'big good'})
+    client.post('/create', data={'name': 'apartment1', 'room_number': 5, 'bathroom_number': 5,
+                                 'street_address': '225 terry ave n', 'city': 'seattle', 'state': 'WA', 'zip': 98115,
+                                 'price': 2500, 'sqft': 2500, 'description': 'big good'})
     with app.app_context():
         db = get_db()
+        created = db.execute(
+            'SELECT * FROM apartment WHERE apartment_id = 2').fetchone()
         cursor = db.cursor()
         cursor.execute('SELECT * FROM apartment WHERE apartment_id = 12')
         created = cursor.fetchone()
         assert created['zip'] == 98107
+
 
 def test_browse(client, auth, app):
     response = client.get('/apartment/12/browse')
@@ -122,12 +121,14 @@ def test_browse(client, auth, app):
     assert response.status_code == 404
     assert b"Apartment id 42 doesn't exist." in response.data
 
+
 def test_get_ownerList(client, auth, app):
-        auth.login()
-        response = client.get('/apartment/ownerList')
-        assert response.status_code == 200
-        datas = json.loads(response.data)
-        assert 2 == len(datas)
+    auth.login()
+    response = client.get('/apartment/ownerList')
+    assert response.status_code == 200
+    datas = json.loads(response.data)
+    assert 2 == len(datas)
+
 
 def test_get_reservationList(client, auth, app):
         auth.login()

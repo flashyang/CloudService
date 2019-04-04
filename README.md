@@ -28,6 +28,13 @@ heroku addons:create cleardb:ignite -a quiet-inlet-97604
 heroku config -a quiet-inlet-97604 | grep CLEARDB_DATABASE_URL
 
 pip install PyMySQL
+
+
+testing database:
+
+heroku addons:create cleardb:ignite -a fast-reaches-11674
+
+heroku config -a fast-reaches-11674 | grep CLEARDB_DATABASE_URL
 ```
 
 
@@ -47,6 +54,8 @@ export FLASK_APP=groupnest
 export FLASK_ENV=development
 
 export DATABASE_URL=mysql://b4fda20e6f61ef:f9356ca7@us-cdbr-iron-east-03.cleardb.net/heroku_46f4b90a3346330
+
+export TEST_DATABASE_URL=mysql://b51ab60be50de0:b0ddd521@us-cdbr-iron-east-03.cleardb.net/heroku_36faaceaabbea7e
 
 flask init-db
 

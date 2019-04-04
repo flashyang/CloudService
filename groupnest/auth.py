@@ -89,7 +89,24 @@ def index():
         logging.info('One user registered!')
     session['user_id'] = user['user_id']
     return redirect(url_for('apartment.index'))
+    
+# This is for test use
+@bp.route('/test/login', methods=('GET', 'POST'))
+def login_test():
+    if request.method == 'POST':
+        username = request.form['username']
+        db = get_db()
+        error = None
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute('SELECT * FROM user WHERE username= %s', (username,))
+        user = cursor.fetchone()
+        if error is None:
+            session.clear()
+            session['user_id'] = user['user_id']
 
+        flash(error)
+    return redirect(url_for('apartment.index'))
 
 
 @bp.route('/auth/login')
@@ -122,12 +139,11 @@ def logout():
 
 def login_required(view):
     @functools.wraps(view)
-    def wrapped_view(**kwargs):
+    def wrapped_view(*args,**kwargs):
         if g.user is None:
-            print("No user")
-            return redirect(url_for('auth.login'))
+            return redirect(url_for('auth.index'))
 
-        return view(**kwargs)
+        return view(*args,**kwargs)
 
     return wrapped_view
 

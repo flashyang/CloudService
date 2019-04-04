@@ -35,16 +35,15 @@ def test_search(client, auth, app):
 
 
 def test_delete_appartment(client, auth, app):
-    # auth.login()
-    assert client.post('/apartment/7/delete').status_code == 404
-    response = client.post('/apartment/9/delete')
-    assert b'doesn\'t exist.' in response.data
-    client.post('/apartment/2/delete')
+    auth.login()
     with app.app_context():
         db = get_db()
         cursor = db.cursor()
-        cursor.execute(
-            'SELECT * FROM apartment WHERE apartment_id = 2')
+        assert client.post('/apartment/7/delete').status_code == 404
+        response = client.post('/apartment/9/delete')
+        assert b'doesn\'t exist.' in response.data
+        client.post('/apartment/2/delete')
+        cursor.execute('SELECT * FROM apartment WHERE apartment_id = 2')
         apartment = cursor.fetchone()
         assert apartment is None
         cursor.execute('SELECT * FROM nest WHERE nest_id = 2')
@@ -57,7 +56,7 @@ def test_delete_appartment(client, auth, app):
 
 
 def test_update_appartment(client, auth, app):
-    # auth.login()
+    auth.login()
 
     response = client.get('/apartment/2/update')
     assert b'Are you sure?' in response.data
@@ -80,7 +79,7 @@ def test_update_appartment(client, auth, app):
 
 
 def test_create(client, auth, app):
-    # auth.login()
+    auth.login()
     assert client.get('/apartment/create').status_code == 200
     response = client.post('/apartment/create', data={'name': '',
                                                       'room_number': 5,
@@ -95,8 +94,6 @@ def test_create(client, auth, app):
                                  'price': 2500, 'sqft': 2500, 'description': 'big good'})
     with app.app_context():
         db = get_db()
-        created = db.execute(
-            'SELECT * FROM apartment WHERE apartment_id = 2').fetchone()
         cursor = db.cursor()
         cursor.execute('SELECT * FROM apartment WHERE apartment_id = 12')
         created = cursor.fetchone()
@@ -104,6 +101,7 @@ def test_create(client, auth, app):
 
 
 def test_browse(client, auth, app):
+    auth.login()
     response = client.get('/apartment/12/browse')
     assert response.status_code == 200
     datas = json.loads(response.data)
@@ -122,7 +120,7 @@ def test_browse(client, auth, app):
 
 
 def test_get_ownerList(client, auth, app):
-    # auth.login()
+    auth.login()
     response = client.get('/apartment/ownerList')
     assert response.status_code == 200
     datas = json.loads(response.data)
@@ -130,7 +128,7 @@ def test_get_ownerList(client, auth, app):
 
 
 def test_get_reservationList(client, auth, app):
-        # auth.login()
+        auth.login()
         response = client.get('/apartment/reserveList')
         assert response.status_code == 200
         datas = json.loads(response.data)

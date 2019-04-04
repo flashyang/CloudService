@@ -3,13 +3,11 @@ import tempfile
 import urllib
 
 import pytest
-from flask import g, session
 from groupnest import create_app
 from groupnest.db import get_db, init_db
 
 with open(os.path.join(os.path.dirname(__file__), 'data.sql'), 'rb') as f:
     _data_sql = f.read().decode('utf8')
-
 
 
 @pytest.fixture
@@ -19,7 +17,6 @@ def app():
         # 'DATABASE': db_path,
     })
 
-    
     url = urllib.parse.urlparse(os.environ['TEST_DATABASE_URL'])
     app.config["DATABASE_HOSTNAME"] = url.hostname
     app.config["DATABASE_USERNAME"] = url.username
@@ -59,23 +56,15 @@ class AuthActions(object):
     def __init__(self, client):
         self._client = client
 
-    def login(username='test', first_name='first', last_name='last', email='test@gmail.com'):
-        db = get_db()
-        cursor = db.cursor()
-        cursor.execute(
-            'SELECT user_id'
-            ' FROM user'
-            ' WHERE username = %s',
-            (username,)
+    def login(self, username='test',  first_name='first', last_name='last', email='test@gmail.com', gender='FEMALE', description='good'):
+        return self._client.post(
+            '/test/login',
+            data={'username': username, 'first_name': first_name,
+                  'last_name': last_name, 'email': email, 'gender': gender, 'description': description}
         )
-        session.clear()
-        userID = cursor.fetchone()['user_id']
-        session['user_id'] = user['user_id']
-        return true
 
     def logout(self):
-        session.clear()
-        return false
+        return self._client.get('/auth/logout')
 
 
 @pytest.fixture

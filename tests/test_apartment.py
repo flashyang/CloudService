@@ -42,19 +42,19 @@ def test_delete_appartment(client, auth, app):
     assert client.post('/apartment/7/delete').status_code == 404
     response = client.post('/apartment/9/delete')
     assert b'doesn\'t exist.' in response.data
-    client.post('/apartment/1/delete')
+    client.post('/apartment/2/delete')
     with app.app_context():
         db = get_db()
         cursor = db.cursor()
         cursor.execute(
-            'SELECT * FROM apartment WHERE apartment_id = 1')
+            'SELECT * FROM apartment WHERE apartment_id = 2')
         apartment = cursor.fetchone()
         assert apartment is None
-        cursor.execute('SELECT * FROM nest WHERE nest_id = 1')
+        cursor.execute('SELECT * FROM nest WHERE nest_id = 2')
         nest = cursor.fetchall()
         assert len(nest) == 0
         cursor.execute(
-            'SELECT * FROM reservation WHERE reservation_id = 1')
+            'SELECT * FROM reservation WHERE reservation_id = 2')
         reservation = cursor.fetchall()
         assert len(reservation) == 0
 
@@ -62,22 +62,22 @@ def test_delete_appartment(client, auth, app):
 def test_update_appartment(client, auth, app):
     auth.login()
 
-    response = client.get('/apartment/1/update')
+    response = client.get('/apartment/2/update')
     assert b'Are you sure?' in response.data
 
-    assert client.get('/apartment/2/update').status_code == 403
+    assert client.get('/apartment/12/update').status_code == 403
 
-    response = client.post('/apartment/1/update', data={'name': '', 'room_number': '2', 'bathroom_number':'2', 'zip':'98107', 'street_address':'HAHA', 'city':'Seattle', 'state':'WA', 'price':'1000','sqft':'200', 'description':'','photo_URL':''})
+    response = client.post('/apartment/2/update', data={'name': '', 'room_number': '2', 'bathroom_number':'2', 'zip':'98107', 'street_address':'HAHA', 'city':'Seattle', 'state':'WA', 'price':'1000','sqft':'200', 'description':'','photo_URL':''})
     assert b'Name is required.' in response.data
 
-    response = client.post('/apartment/1/update', data={'name': 'AAA', 'room_number': '2', 'bathroom_number':'2', 'zip':'98107', 'street_address':'HAHA', 'city':'Seattle', 'state':'WA', 'price':'1000','sqft':'200', 'description':'','photo_URL':''})
+    response = client.post('/apartment/2/update', data={'name': 'AAA', 'room_number': '2', 'bathroom_number':'2', 'zip':'98107', 'street_address':'HAHA', 'city':'Seattle', 'state':'WA', 'price':'1000','sqft':'200', 'description':'','photo_URL':''})
     assert b'Redirecting' in response.data
    
     with app.app_context():
         db = get_db()
         cursor = db.cursor()
         cursor.execute(
-            'SELECT * FROM apartment WHERE apartment_id = 1')
+            'SELECT * FROM apartment WHERE apartment_id = 2')
         apartment = cursor.fetchone()
         assert apartment['name'] == 'AAA'
 
@@ -101,12 +101,12 @@ def test_create(client, auth, app):
     with app.app_context():
         db = get_db()
         cursor = db.cursor()
-        cursor.execute('SELECT * FROM apartment WHERE apartment_id = 2')
+        cursor.execute('SELECT * FROM apartment WHERE apartment_id = 12')
         created = cursor.fetchone()
         assert created['zip'] == 98107
 
 def test_browse(client, auth, app):
-    response = client.get('/apartment/2/browse')
+    response = client.get('/apartment/12/browse')
     assert response.status_code == 200
     datas = json.loads(response.data)
     assert datas['room_number'] == 2
@@ -116,11 +116,11 @@ def test_browse(client, auth, app):
     assert datas['city'] == 'Seattle'
     assert datas['state'] == 'WA'
     assert datas['name'] == 'apt2'
-    assert datas['landlord_id'] == 2
+    assert datas['landlord_id'] == 12
 
-    response = client.get('/apartment/5/browse')
+    response = client.get('/apartment/42/browse')
     assert response.status_code == 404
-    assert b"Apartment id 5 doesn't exist." in response.data
+    assert b"Apartment id 42 doesn't exist." in response.data
 
 def test_get_ownerList(client, auth, app):
         auth.login()
@@ -137,4 +137,4 @@ def test_get_reservationList(client, auth, app):
 
         assert 8 == len(datas)
         assert datas[7]['accept_offer'] == 0
-        assert datas[1]['nest_id'] == 3
+        assert datas[1]['nest_id'] == 22

@@ -5,19 +5,19 @@ from groupnest.db import get_db
 
 def test_get_fullNest(client, auth, app):
     auth.login()
-    response = client.get('/nest/1/fullNest')
+    response = client.get('/nest/2/fullNest')
     datas = json.loads(response.data)
     assert 2 == len(datas)
 
 def test_get_notfullNest(client, auth, app):
     auth.login()
-    response = client.get('/nest/1/notFullNest')
+    response = client.get('/nest/2/notFullNest')
     datas = json.loads(response.data)
     assert 4 == len(datas)
 
 def test_get_allNests(client, auth, app):
     auth.login()
-    response = client.get('/nest/1/allNests')
+    response = client.get('/nest/2/allNests')
     data = json.loads(response.data)
     full_nest = data['fullnest']
     not_full = data['notFullnest']
@@ -25,7 +25,7 @@ def test_get_allNests(client, auth, app):
 
 def test_nestUser(client, auth, app):
     auth.login()
-    response = client.get('/nest/1')
+    response = client.get('/nest/2')
     data = json.loads(response.data)
     assert 2 == data['room_number']
     assert 2 == data['user_number']
@@ -71,14 +71,14 @@ def test_get_ownerNest(client, auth, app):
 def test_create(client, auth, app):
 
     auth.login()
-    response = client.get('/nest/11/create')
+    response = client.get('/nest/20/create')
     assert response.status_code == 404
     assert b'Apartment not found.' in response.data
 
-    assert client.get('/nest/1/create').status_code == 200
+    assert client.get('/nest/2/create').status_code == 200
 
     for i in range(5):
-        response = client.post('/nest/2/create', data={})
+        response = client.post('/nest/12/create', data={})
         with app.app_context(), client:
             db = get_db()
             cursor = db.cursor()
@@ -89,7 +89,7 @@ def test_create(client, auth, app):
                 WHERE r.tenant_id = %s
                 AND n.apartment_id = %s""",
                 # ORDER BY created DESC""",
-                (g.user['user_id'], 2)
+                (g.user['user_id'], 12)
             )
             record = cursor.fetchall()
             len(record) == 2+i
@@ -104,34 +104,34 @@ def test_create(client, auth, app):
 
 def test_update(client, auth, app):
     auth.login()
-    response = client.get('/nest/11/update')
+    response = client.get('/nest/20/update')
     assert response.status_code == 404
     assert b'Nest not found' in response.data
 
-    response = client.get('/nest/1/update')
+    response = client.get('/nest/2/update')
     assert b'Redirecting' in response.data
 
-    response = client.post('/nest/1/update', data={'decision': ''})
+    response = client.post('/nest/2/update', data={'decision': ''})
     assert b'Decision is required.' in response.data
 
-    response = client.post('/nest/8/update', data={'decision': 'APPROVED'})
+    response = client.post('/nest/72/update', data={'decision': 'APPROVED'})
     assert response.status_code == 302
     assert b'Redirecting' in response.data
     with app.app_context():
         db = get_db()
         cursor = db.cursor()
         cursor.execute(
-            'SELECT status FROM nest WHERE nest_id = 1')
+            'SELECT status FROM nest WHERE nest_id = 2')
         nest = cursor.fetchone()
         assert nest['status'] == 'APPROVED'
 
-    response = client.post('/nest/1/update', data={'decision': 'REJECTED'})
+    response = client.post('/nest/2/update', data={'decision': 'REJECTED'})
     assert b'Cannot change nest status that is not PENDING' in response.data
 
-    response = client.post('/nest/3/update', data={'decision': 'REJECTED'})
+    response = client.post('/nest/22/update', data={'decision': 'REJECTED'})
     assert b'Current user is not authorized to alter the status of this nest.' in response.data
 
-    response = client.post('/nest/2/update', data={'decision': 'APPROVED'})
+    response = client.post('/nest/12/update', data={'decision': 'APPROVED'})
     assert b'Landlord has already approved one nest' in response.data
 
     with app.app_context():
@@ -140,8 +140,8 @@ def test_update(client, auth, app):
         cursor.execute(
             """UPDATE nest SET status = %s
             WHERE nest_id = %s""",
-            ('PENDING', 1)
+            ('PENDING', 2)
         )
         db.commit()
-    response = client.post('/nest/4/update', data={'decision': 'APPROVED'})
+    response = client.post('/nest/32/update', data={'decision': 'APPROVED'})
     assert b'This nest is not full yet, landlord cannot alter nest status' in response.data

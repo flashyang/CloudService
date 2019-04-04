@@ -17,10 +17,11 @@ def app():
         # 'DATABASE': db_path,
     })
 
-    app.config["DATABASE_HOSTNAME"] = "localhost"
-    app.config["DATABASE_USERNAME"] = "root"
-    app.config["DATABASE_PASSWORD"] = ""
-    app.config["DATABASE_NAME"]     = "groupnestdatabase"
+    url = urllib.parse.urlparse(os.environ['TEST_DATABASE_URL'])
+    app.config["DATABASE_HOSTNAME"] = url.hostname
+    app.config["DATABASE_USERNAME"] = url.username
+    app.config["DATABASE_PASSWORD"] = url.password
+    app.config["DATABASE_NAME"]     = url.path[1:]
 
     with app.app_context():
         init_db()
@@ -30,7 +31,7 @@ def app():
         ret = _data_sql.split(';')
         # drop last empty entry
         ret.pop()
-                
+
         for stmt in ret:
             db.cursor().execute(stmt + ";")
         db.commit()

@@ -36,12 +36,6 @@ def create_app(test_config=None):
     app.config["DATABASE_USERNAME"] = url.username
     app.config["DATABASE_PASSWORD"] = url.password
     app.config["DATABASE_NAME"]     = url.path[1:]
-
-    url = urllib.parse.urlparse(os.environ['DATABASE_URL'])
-    app.config["DATABASE_HOSTNAME"] = url.hostname
-    app.config["DATABASE_USERNAME"] = url.username
-    app.config["DATABASE_PASSWORD"] = url.password
-    app.config["DATABASE_NAME"]     = url.path[1:]
     
     if test_config is None:
         # load the instance config, if it exists, when not testing

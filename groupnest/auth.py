@@ -67,8 +67,8 @@ def index():
         session.pop('access_token', None)
         return redirect(url_for('auth.login'))
     username = req.json()['email']
-    first_name = req.json()['given_name']
-    last_name = req.json()['family_name']
+    first_name = req.json()['email']
+    last_name = req.json()['email']
     email = req.json()['email']
     db = get_db()
     cursor = db.cursor()

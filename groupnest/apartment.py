@@ -153,7 +153,7 @@ def delete(apartmentId):
 @login_required
 def update(apartmentId):
     apartment = get_apartment(apartmentId)
-    if apartmentId != g.user['user_id']:
+    if apartment['landlord_id'] != g.user['user_id']:
         abort(403, "You can only modify your own apartment.")
 
     if request.method == 'POST':

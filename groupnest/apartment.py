@@ -1,109 +1,109 @@
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, url_for, jsonify
 )
-
-from werkzeug.contrib.cache import SimpleCache
-cache = SimpleCache()
-
 from werkzeug.exceptions import abort
 
 from groupnest.auth import login_required
 from groupnest.db import get_db
 
 import logging
+import json
+import redis
 
 bp = Blueprint('apartment', __name__, url_prefix='/apartment')
+r = redis.Redis(
+                host='ec2-18-220-62-128.us-east-2.compute.amazonaws.com',
+                port=6379,
+                #password='12345678901234567890',
+                )
 
 
 # GET: /apartment Return the index page
 @bp.route('/')
 def index():
     db = get_db()
-    apartments = db.execute(
+    cursor = db.cursor()
+    cursor.execute(
         'SELECT *'
         ' FROM apartment'
         ' ORDER BY created DESC'
         ' LIMIT 10'
-    ).fetchall()
-    result = []
-    if apartments:
-        for index in range(len(apartments)):
-            apt = apartments[index]
-            item = {}
-            item['name'] = apt['name']
-            item['room_number'] = apt['room_number']
-            item['bathroom_number'] = apt['bathroom_number']
-            item['street_address'] = apt['street_address']
-            item['zip'] = apt['zip']
-            item['city'] = apt['city']
-            item['state'] = apt['state']
-            item['price'] = apt['price']
-            item['sqft'] = apt['sqft']
-            item['description'] = apt['description']
-            item['photo_URL'] = apt['photo_URL']
-            result.append(item)
-        return jsonify(result)
-    else:
-        abort(404,
-              "No available apartment. Sorry! :(")
-
+    )
+    apartments = cursor.fetchall()
+    return jsonify(apartments)
 
 # GET: /apartment/search (zipcode)
 # Get a list of apartments by searching zipcode
 @bp.route('/search', methods=('GET', 'POST'))
 def search():
     db = get_db()
+    cursor = db.cursor()
     if request.method == 'POST':
         zip = request.form['zip']
         error = None
         if not zip:
             error = 'ZipCode is required.'
-        StringZip = zip.str();
-        cacheZipResult = cache.get(StringZip)
+
+        cached_zip_result = r.get(zip)
 
         result = []
         if error is not None:
             flash(error)
-        elif cacheZipResult is not None:
-            return jsonify(cacheZipResult);
+        elif cached_zip_result is not None:
+            unpacked_result = r.get(zip)
+            print(1)
+            print(unpacked_result)
+            return unpacked_result
         else:
-            apartments = db.execute(
+            print(2)
+            cursor.execute(
                 'SELECT *'
                 ' FROM apartment'
-                ' WHERE zip = ?'
+                ' WHERE zip = %s'
                 ' ORDER BY created DESC',
                 (zip,)
-            ).fetchall()
+            )
+            apartments = cursor.fetchall()
             if apartments:
-                for index in range(len(apartments)):
-                    apt = apartments[index]
-                    item = {}
-                    item['name'] = apt['name']
-                    item['room_number'] = apt['room_number']
-                    item['bathroom_number'] = apt['bathroom_number']
-                    item['zip'] = apt['zip']
-                    item['city'] = apt['city']
-                    item['state'] = apt['state']
-                    item['price'] = apt['price']
-                    item['sqft'] = apt['sqft']
-                    result.append(item)
-                cache.set(StringZip, result, timeout=5 * 60)
-                return jsonify(result)
+                # for index in range(len(apartments)):
+                #     apt = apartments[index]
+                #     item = {}
+                #     item['name'] = apt['name']
+                #     item['room_number'] = apt['room_number']
+                #     item['bathroom_number'] = apt['bathroom_number']
+                #     item['zip'] = apt['zip']
+                #     item['city'] = apt['city']
+                #     item['state'] = apt['state']
+                #     item['price'] = apt['price']
+                #     item['sqft'] = apt['sqft']
+                #     result.append(item)
+                # return jsonify(result)
+                print('apartments')
+                print(apartments)
+                json_result = jsonify(apartments)
+                print('json_result')
+                print(json_result)
+                r.set(zip, apartments)
+                r.expire(zip, 100)
+                return json_result
             else:
                 abort(404,
                       "No such apartment matching given zipcode exists in our databse. Sorry! :(")
     return redirect(url_for('apartment.index'))
 
-
 # Get a apartment by apartmentId
 
+
 def get_apartment(apartmentId, check_user=True):
-    apartment = get_db().execute(
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute(
         'SELECT *'
         ' FROM apartment'
-        ' WHERE apartment_id = ?',
+        ' WHERE apartment_id = %s',
         (apartmentId,)
-    ).fetchone()
+    )
+    apartment = cursor.fetchone()
 
     if apartment is None:
         abort(404, "Apartment id {0} doesn't exist.".format(apartmentId))
@@ -118,38 +118,53 @@ def get_apartment(apartmentId, check_user=True):
 
 
 def get_nests(apartmentId):
+
+    db = get_db()
+    cursor = db.cursor()
     # check if the given apartmentId is valid
-    apartment = get_db().execute(
+    cursor.execute(
         'SELECT name'
         ' FROM apartment'
-        ' WHERE apartment_id = ?',
+        ' WHERE apartment_id = %s',
         (apartmentId,)
-    ).fetchall()
+    )
+    apartment = cursor.fetchall()
     if len(apartment) == 0:
         abort(404, "Apartment id {0} doesn't exist.".format(id))
 
-    nestList = get_db().execute(
+    cursor.execute(
         'SELECT *'
         ' FROM nest'
-        ' WHERE apartment_id = ?',
+        ' WHERE apartment_id = %s',
         (apartmentId,)
-    ).fetchall()
+    )
+    nestList = cursor.fetchall()
 
     return nestList
 
 # DELETE: /apartment/<int: apartmentId>/delete
 # Delete all the apartment data including nest and reservations for giving apartmentId.
-@bp.route('/<int:apartmentId>/delete', methods=('POST',))
+@bp.route('/<int:apartmentId>/delete', methods=('POST','GET'))
 @login_required
 def delete(apartmentId):
     nestList = get_nests(apartmentId)
     db = get_db()
+    cursor = db.cursor()
+    cursor.execute(
+        'SELECT landlord_id'
+        ' FROM apartment'
+        ' WHERE apartment_id = %s',
+        (apartmentId,)
+    )
+    landlordId = cursor.fetchone()['landlord_id']
+    if landlordId != g.user['user_id']:
+        abort(403, "You can only delete your own apartment.")
     if nestList is not None:
         for nest in nestList:
             nestId = nest['nest_id']
-            db.execute('DELETE FROM reservation WHERE nest_id = ?', (nestId,))
-    db.execute('DELETE FROM nest WHERE apartment_id = ?', (apartmentId,))
-    db.execute('DELETE FROM apartment WHERE apartment_id = ?', (apartmentId,))
+            cursor.execute('DELETE FROM reservation WHERE nest_id = %s', (nestId,))
+    cursor.execute('DELETE FROM nest WHERE apartment_id = %s', (apartmentId,))
+    cursor.execute('DELETE FROM apartment WHERE apartment_id = %s', (apartmentId,))
     db.commit()
     return redirect(url_for('apartment.index'))
 
@@ -160,7 +175,7 @@ def delete(apartmentId):
 @login_required
 def update(apartmentId):
     apartment = get_apartment(apartmentId)
-    if apartmentId != g.user['user_id']:
+    if apartment['landlord_id'] != g.user['user_id']:
         abort(403, "You can only modify your own apartment.")
 
     if request.method == 'POST':
@@ -184,9 +199,10 @@ def update(apartmentId):
             flash(error)
         else:
             db = get_db()
-            db.execute(
-                'UPDATE apartment SET name = ?, room_number = ?, bathroom_number = ? , street_address = ?,  city = ?, state = ?, zip = ?, price = ?, sqft = ?, description = ?, photo_URL = ?'
-                ' WHERE apartment_id = ?',
+            cursor = db.cursor()
+            cursor.execute(
+                'UPDATE apartment SET name = %s, room_number = %s, bathroom_number = %s, street_address = %s,  city = %s, state = %s, zip = %s, price = %s, sqft = %s, description = %s, photo_URL = %s'
+                ' WHERE apartment_id = %s',
                 (name, room_number, bathroom_number, street_address, city,
                  state, zip, price, sqft, description, photo_URL, apartmentId)
             )
@@ -237,9 +253,11 @@ def create():
             flash(error)
         else:
             db = get_db()
-            db.execute(
+            cursor = db.cursor()
+            #Store apartment inforamtion
+            cursor.execute(
                 'INSERT INTO apartment (room_number, bathroom_number, street_address, city,state,zip ,price,sqft,name,description,landlord_id, photo_URL)'
-                ' VALUES (?, ?, ?,?,?, ?, ?,?,?,?,?,?)',
+                ' VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)',
                 (room_number, bathroom_number, street_address, city, state, zip,
                  price, sqft, name, description, g.user['user_id'], photo_URL)
             )
@@ -276,12 +294,14 @@ def browse(apartmentId):
 @login_required
 def get_ownerList():
     db = get_db()
-    ownerList = db.execute(
+    cursor = db.cursor()
+    cursor.execute(
         'SELECT a.name, a.street_address, a.price, username,room_number,bathroom_number,street_address,zip,city,state,price,sqft'
         ' FROM apartment a JOIN user u ON a.landlord_id = u.user_id'
-        ' WHERE u.user_id = ?',
+        ' WHERE u.user_id = %s',
         (g.user['user_id'],)
-    ).fetchall()
+    )
+    ownerList = cursor.fetchall()
     if not ownerList:
         abort(404, "There is no apartments in your account:(")
 
@@ -301,23 +321,25 @@ def get_ownerList():
         result.append(item)
     return jsonify(result)
 
-    # return "ownerList is in construction"
-    return jsonify(ownerList)
 
 # GET:/apartment/reserveList
 # Return a list of reservations in a given user id.
 @bp.route('/reserveList', methods=('GET',))
 @login_required
 def get_reservations():
-    reserveList = get_db().execute(
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute(
         'SELECT reservation_id, r.nest_id, created, accept_offer'
         ' FROM reservation r'
-        ' WHERE r.tenant_id = ?',
+        ' WHERE r.tenant_id = %s',
         (g.user['user_id'],)
-    ).fetchall()
+    )
+    reserveList = cursor.fetchall()
 
     if reserveList is None:
-        abort(404, "Nest id {0} doesn't exist or doesn't have reservations.".format(g.user['user_id']))
+        abort(404, "Nest id {0} doesn't exist or doesn't have reservations.".format(
+            g.user['user_id']))
 
     result = []
     for index in range(len(reserveList)):

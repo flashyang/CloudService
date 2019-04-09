@@ -59,7 +59,7 @@ def index():
     access_token = access_token[0]
 
     headers = {'Authorization': 'Bearer ' +access_token}
-                            
+                       
     req = requests.get('https://www.googleapis.com/oauth2/v1/userinfo',
                   headers = headers)
     if not req.status_code is 200:

@@ -7,8 +7,15 @@ from groupnest.auth import login_required
 from groupnest.db import get_db
 
 import logging
+import json
+import redis
 
 bp = Blueprint('apartment', __name__, url_prefix='/apartment')
+r = redis.Redis(#host='localhost',
+                host='ec2-18-220-62-128.us-east-2.compute.amazonaws.com',
+                port=6379,
+                #password='12345678901234567890',
+                )
 
 
 # GET: /apartment Return the index page
@@ -37,10 +44,17 @@ def search():
         if not zip:
             error = 'ZipCode is required.'
 
-        result = []
+        cached_zip_result = r.get(zip)
+
         if error is not None:
             flash(error)
+        elif cached_zip_result is not None:
+            unpacked_result = r.get(zip)
+            print(1)
+            print(unpacked_result)
+            return jsonify(unpacked_result)
         else:
+            print(2)
             cursor.execute(
                 'SELECT *'
                 ' FROM apartment'
@@ -63,7 +77,14 @@ def search():
                 #     item['sqft'] = apt['sqft']
                 #     result.append(item)
                 # return jsonify(result)
-                return jsonify(apartments)
+                print('apartments')
+                print(apartments)
+                json_result = jsonify(apartments)
+                print('json_result')
+                print(json_result)
+                r.set(zip, apartments)
+                r.expire(zip, 100)
+                return json_result
             else:
                 abort(404,
                       "No such apartment matching given zipcode exists in our databse. Sorry! :(")

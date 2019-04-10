@@ -56,10 +56,10 @@ class AuthActions(object):
     def __init__(self, client):
         self._client = client
 
-    def login(self, username='test',  first_name='first', last_name='last', email='test@gmail.com', gender='FEMALE', description='good'):
+    def login(self, username='test', password='test', first_name='first', last_name='last', email='test@gmail.com', gender='FEMALE', description='good'):
         return self._client.post(
-            '/test/login',
-            data={'username': username, 'first_name': first_name,
+            '/auth/login',
+            data={'username': username, 'password': password, 'first_name': first_name,
                   'last_name': last_name, 'email': email, 'gender': gender, 'description': description}
         )
 

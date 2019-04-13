@@ -4,7 +4,7 @@
 {% block content %}
 <script type=text/javascript>
     $(function() {
-        let url = $SCRIPT_ROOT + 'nest/' + {{apartmentId}} + '/notFullNest'
+        let url = $SCRIPT_ROOT + '/nest/' + {{apartmentId}} + '/notFullNest'
         $.getJSON(url, {}, function(data) {
           $("#result").html('<tr><th>Total Room</th><th>Register Room</th></tr>');
           $.each(data, function(index, nest) {

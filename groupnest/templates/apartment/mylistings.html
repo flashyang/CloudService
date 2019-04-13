@@ -26,9 +26,10 @@
                 // TODO: May add btn for approve funtion and call other related API
                 // This is to render fullNest
                   $.getJSON($SCRIPT_ROOT + link_full, function(data) {
-                      $("#result_nest").html('');
+                      $("#result").append(
+                        "<header><div><h3>This is the Full Nests infor for ApartmentID: "+ id);
                       $.each(data, function(index, full) {
-                        $('#result_nest').append('<header><div><h2>Full Nest ID: ' + full.nest_id
+                        $('#result').append('<header><div><h4>Full Nest ID: ' + full.nest_id
                         + '</h2></div></header>' 
                         + '<p class="body">Room Number: '+ full.room_number
                         + ', User Number: '+ full.user_number + '</p>');
@@ -36,13 +37,16 @@
                   });
                   // This is to render notFull Nests
                   $.getJSON($SCRIPT_ROOT + link_notFull, function(data) {
-                      $("#result_nest").html('');
+                    $("#result").append("-----------------------------------------------------------------------");
+                    $("#result").append(
+                        "<header><div><h3>This is the Not Full Nests for ApartmentID: "+ id);
                       $.each(data, function(index, notFull) {
-                        $('#result_nest').append('<header><div><h2>Not_Full Nest ID: ' + notFull.nest_id
+                        $('#result').append('<header><div><h4>Not_Full Nest ID: ' + notFull.nest_id
                         + '</h2></div></header>' 
                         + '<p class="body">Room Number: '+ notFull.room_number
                         + ', User Number: '+ notFull.user_number + '</p>');
                       });
+                    $("#result").append("----------------------------------------------------------------------");
                   });
               });
             
@@ -53,7 +57,9 @@
   </script>
  <!-- <p><input type=text size=5 name=zipcode>  <a href=# id=search> search by zipcode</a><p></p> -->
     <span><span id=result>
+
     <span><span id=result_nest>
+    <span><span id=notfull>
     </span></span>
     
     <!-- {% for apartment in result %} -->

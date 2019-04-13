@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+<script type=text/javascript>
+    $(function() {
+        let url = $SCRIPT_ROOT + '/nest/' + {{apartmentId}} + '/notFullNest'
+        $.getJSON(url, {}, function(data) {
+          $("#result").html('<tr><th>Total Room</th><th>Register Room</th><th>Join</th></tr>');
+          $.each(data, function(index, nest) {
+            var local_url = $SCRIPT_ROOT + 'nest/' + {{apartmentId}} + '/create'
+            $('#result').append('<tr><td>'
+                + nest.room_number + '</td><td>' 
+                + nest.user_number + '</td><td>'
+                + "<a href='" + local_url + "'>Join this nest</a></td><td>");
+				  });
+        });
+        let creatUrl = $SCRIPT_ROOT + '/nest/' + {{apartmentId}} + '/create'
+        $('a#create').bind('click', function() {
+          $.post( "ajax/test.html", {}, function( data ) {});
+        });
+        return false;
+    });
+  </script>
+
+<p><a href=# id=create> Create new nest</a></p>
+<h1>Available Nest</h1>
+<div><table id=result></table></div>
+
+{% endblock %}

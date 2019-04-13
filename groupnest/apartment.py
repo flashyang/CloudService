@@ -38,60 +38,73 @@ def index():
 def search():
     db = get_db()
     cursor = db.cursor()
-    if request.method == 'POST':
-        zip = request.form['zip']
-        error = None
-        if not zip:
-            error = 'ZipCode is required.'
+    # if request.method == 'POST':
+        # zip = request.form['zip']
 
-        cached_zip_result = r.get(zip)
+    zip = request.args.get('zipcode', 0, type=int)
+    print("Search by zipcode: ", zip)
 
-        if error is not None:
-            flash(error)
-        elif cached_zip_result is not None:
-            unpacked_result = r.get(zip)
-            print(1)
-            print(unpacked_result)
-            return jsonify(unpacked_result)
-        else:
-            print(2)
-            cursor.execute(
-                'SELECT *'
-                ' FROM apartment'
-                ' WHERE zip = %s'
-                ' ORDER BY created DESC',
-                (zip,)
-            )
-            apartments = cursor.fetchall()
-            if apartments:
-                # for index in range(len(apartments)):
-                #     apt = apartments[index]
-                #     item = {}
-                #     item['name'] = apt['name']
-                #     item['room_number'] = apt['room_number']
-                #     item['bathroom_number'] = apt['bathroom_number']
-                #     item['zip'] = apt['zip']
-                #     item['city'] = apt['city']
-                #     item['state'] = apt['state']
-                #     item['price'] = apt['price']
-                #     item['sqft'] = apt['sqft']
-                #     result.append(item)
-                # return jsonify(result)
-                print('apartments')
-                print(apartments)
-                json_result = jsonify(apartments)
-                print('json_result')
-                print(json_result)
-                r.set(zip, apartments)
-                r.expire(zip, 100)
-                return json_result
-            else:
-                abort(404,
-                      "No such apartment matching given zipcode exists in our databse. Sorry! :(")
-    return redirect(url_for('apartment.index'))
+    error = None
+    if not zip:
+        error = 'ZipCode is required.'
+
+    cached_zip_result = r.get(zip)
+
+    if error is not None:
+        flash(error)
+    elif cached_zip_result is not None:
+        # unpacked_result = r.get(zip)
+        print(1)
+        # print(unpacked_result)
+        # return jsonify(unpacked_result)
+        apartments = r.get(zip)
+        cacheresult = apartments.decode('utf8').replace("'", '"')
+        print('cache result: ', cacheresult)
+        return cacheresult
+    else:
+        print(2)
+        cursor.execute(
+            'SELECT *'
+            ' FROM apartment'
+            ' WHERE zip = %s'
+            ' ORDER BY created DESC',
+            (zip,)
+        )
+        apartments = cursor.fetchall()
+        if apartments:
+            # for index in range(len(apartments)):
+            #     apt = apartments[index]
+            #     item = {}
+            #     item['name'] = apt['name']
+            #     item['room_number'] = apt['room_number']
+            #     item['bathroom_number'] = apt['bathroom_number']
+            #     item['zip'] = apt['zip']
+            #     item['city'] = apt['city']
+            #     item['state'] = apt['state']
+            #     item['price'] = apt['price']
+            #     item['sqft'] = apt['sqft']
+            #     result.append(item)
+            # return jsonify(result)
+            print('apartments')
+            print(apartments)
+            json_result = jsonify(apartments)
+            print('json_result')
+            print(json_result)
+            r.set(zip, apartments)
+            r.expire(zip, 100)
+            # return json_result
+            return jsonify(apartments)
+        # else:
+        #     abort(404,
+        #             "No such apartment matching given zipcode exists in our databse. Sorry! :(")
+    # return redirect(url_for('apartment.index'))
+    return jsonify([])
 
 # Get a apartment by apartmentId
 
+@bp.route('/searchresult')
+def searchresult():
+    return render_template('apartment/searchresult.html')
 
 def get_apartment(apartmentId, check_user=True):
     db = get_db()
@@ -320,6 +333,9 @@ def get_ownerList():
         result.append(item)
     return jsonify(result)
 
+@bp.route('/mylistings')
+def mylistings():
+    return render_template('apartment/mylistings.html')
 
 # GET:/apartment/reserveList
 # Return a list of reservations in a given user id.
@@ -350,3 +366,7 @@ def get_reservations():
         item['accept_offer'] = apt['accept_offer']
         result.append(item)
     return jsonify(result)
+
+@bp.route('/myreservations')
+def myreservations():
+    return render_template('apartment/myreservations.html')

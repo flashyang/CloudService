@@ -84,7 +84,7 @@ def login():
 @bp.route('/logout')
 def logout():
     session.clear()
-    return redirect(url_for('apartment.index'))
+    return redirect(url_for('index'))
 
 
 @bp.before_app_request

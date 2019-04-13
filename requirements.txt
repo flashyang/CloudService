@@ -43,19 +43,8 @@ pyzmq==18.0.1
 qtconsole==4.4.3
 Send2Trash==1.5.0
 six==1.12.0
-<<<<<<< HEAD
-terminado==0.8.1
-testpath==0.4.2
-tornado==6.0.1
-traitlets==4.3.2
-wcwidth==0.1.7
-webencodings==0.5.1
-widgetsnbextension==3.4.2
-wrapt==1.11.1
-=======
 uritemplate==3.0.0
 urllib3==1.24.1
 URLObject==2.4.3
 Werkzeug==0.15.1
 redis==2.10.6
->>>>>>> 1227df5c339e7c6b735e85d9e0d279a5eed4d9d0

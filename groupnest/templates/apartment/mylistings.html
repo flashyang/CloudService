@@ -9,16 +9,13 @@
   <script type=text/javascript>
     $(function() {
         $.getJSON($SCRIPT_ROOT + '/apartment/ownerList',function(data) {
-            $("#result").html('');
+          $("#result").html('<tr><th>Apartment ID</th><th>Street Address</th><th>ZipCode</th></tr>');
             $.each(data, function(index, apartment) {
-              var id = apartment.apartment_id;
-              
-              $('#result').append('<header><div><h2>Apartment ID: ' + id
-              +" "
-              + '<button type="button" id="btn_' + id + '"> Details </button>'
-              + '</h2></div></header>' 
-              + '<p class="body">Street_address: '+ apartment.street_address 
-              + ', Zipcode: '+ apartment.zip + '</p>');
+              var id = apartment.apartment_id
+              $('#result').append('<tr><td>' + id 
+              + '<button type="button" id="btn_' + id + '">Details</button></td><td>'
+              + apartment.street_address +  '</td><td>' 
+              + apartment.zip + '</td><tr>');
               
               $('#btn_' + id).click(() => {
                 var link_full = "/nest/"+id+"/fullNest";
@@ -27,7 +24,7 @@
                 // This is to render fullNest
                   $.getJSON($SCRIPT_ROOT + link_full, function(data) {
                       $("#result").append(
-                        "<header><div><h3>This is the Full Nests infor for ApartmentID: "+ id);
+                        "<header><div><h3>Full Nests infor for Apartment_ID: "+ id);
                       $.each(data, function(index, full) {
                         $('#result').append('<header><div><h4>Full Nest ID: ' + full.nest_id
                         + '</h2></div></header>' 
@@ -37,16 +34,16 @@
                   });
                   // This is to render notFull Nests
                   $.getJSON($SCRIPT_ROOT + link_notFull, function(data) {
-                    $("#result").append("-----------------------------------------------------------------------");
+                    $("#result").append("------------------------------------------------------------------");
                     $("#result").append(
-                        "<header><div><h3>This is the Not Full Nests for ApartmentID: "+ id);
+                        "<header><div><h3>Not Full Nests for ApartmentID: "+ id);
                       $.each(data, function(index, notFull) {
                         $('#result').append('<header><div><h4>Not_Full Nest ID: ' + notFull.nest_id
                         + '</h2></div></header>' 
                         + '<p class="body">Room Number: '+ notFull.room_number
                         + ', User Number: '+ notFull.user_number + '</p>');
                       });
-                    $("#result").append("----------------------------------------------------------------------");
+                    $("#result").append("-----------------------------------------------------------------");
                   });
               });
             
@@ -57,9 +54,6 @@
   </script>
  <!-- <p><input type=text size=5 name=zipcode>  <a href=# id=search> search by zipcode</a><p></p> -->
     <span><span id=result>
-
-    <span><span id=result_nest>
-    <span><span id=notfull>
     </span></span>
     
     <!-- {% for apartment in result %} -->

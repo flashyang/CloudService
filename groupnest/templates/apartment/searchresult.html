@@ -12,11 +12,14 @@
         $.getJSON($SCRIPT_ROOT + '/apartment/search', {
           zipcode: $('input[name="zipcode"]').val(),
         }, function(data) {
-          $("#result").html('');
+          $("#result").html('<tr><th>Nest</th><th>Name</th><th>Bedroom</th><th>Bathroom</th><th>Address</th></tr>');
           $.each(data, function(index, apartment) {
-            $('#result').append('<header><div><h2>Apartment ID: ' + apartment.apartment_id + '</h2></div></header>' 
-            + '<p class="body">treet_address: '+ apartment.street_address 
-            + ', zipcode: '+ apartment.zip + '</p>');
+            var local_url = $SCRIPT_ROOT + 'nest/' + apartment.apartment_id + '/associatedNests'
+            $('#result').append('<tr><td>' + "<a href='" + local_url + "'>nest</a></td><td>"
+                + apartment.name + '</td><td>' 
+                + apartment.room_number + '</td><td>' 
+                + apartment.bathroom_number + '</td><td>'
+                + apartment.street_address + ', ' + apartment.city + ', ' + apartment.state + ', ' + apartment.zip + '</td><tr>');
 				  });
         });
         return false;
@@ -25,26 +28,8 @@
   </script>
 
   <p><input type=text size=5 name=zipcode>  <a href=# id=search> search by zipcode</a><p></p>
-    <span><span id=result>
-    </span></span>
+    <div><table id=result></table></div>
     
-    <!-- {% for apartment in result %} -->
-     <!-- <article class="apartment"> -->
-       <!-- <header> -->
-         <div>
-           <h1>apartment id: {{ apartment['apartment_id'] }}</h1>
-           <!-- <div class="about"> {{ apartment['street_address'] }} listed on {{ apartment['created'].strftime('%Y-%m-%d') }}</div> -->
-         </div>
-         <!-- {% if g.user['id'] == post['author_id'] %}
-           <a class="action" href="{{ url_for('blog.update', id=post['id']) }}">Edit</a>
-         {% endif %} -->
-       <!-- </header> -->
-       <p class="body">{{ apartment['sqft'] }}</p>
-     <!-- </article> -->
-     <!-- {% if not loop.last %}
-       <hr>
-     {% endif %}
-    
-   {% endfor %}  -->
+
 {% endblock %}
 </section>

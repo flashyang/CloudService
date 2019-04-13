@@ -7,21 +7,20 @@
 {% block content %}
 <script type=text/javascript>
     $(function() {
-    //   $('a#listings').bind('click', function() {
         $.getJSON($SCRIPT_ROOT + '/apartment', {}, function(data) {
-          $("#result").html('');
+          $("#result").html('<tr><th>Nest</th><th>Name</th><th>Bedroom</th><th>Bathroom</th><th>Address</th></tr>');
           $.each(data, function(index, apartment) {
-            $('#result').append('<header><div><h2>Apartment ID: ' + apartment.apartment_id + '</h2></div></header>' 
-            + '<p class="body">treet_address: '+ apartment.street_address 
-            + ', zipcode: '+ apartment.zip + '</p>');
+            var local_url = $SCRIPT_ROOT + 'nest/' + apartment.apartment_id + '/associatedNests'
+            $('#result').append('<tr><td>' + "<a href='" + local_url + "'>nest</a></td><td>"
+                + apartment.name + '</td><td>' 
+                + apartment.room_number + '</td><td>' 
+                + apartment.bathroom_number + '</td><td>'
+                + apartment.street_address + ', ' + apartment.city + ', ' + apartment.state + ', ' + apartment.zip + '</td><tr>');
 				  });
         });
         return false;
-    //   });
     });
   </script>
 
-<span><span id=result>
-    </span></span>
-
+<div><table id=result></table></div>
 {% endblock %}

@@ -7,33 +7,47 @@
 {% block content %}
 
   <script type=text/javascript>
-   var id;
     $(function() {
         $.getJSON($SCRIPT_ROOT + '/apartment/ownerList',function(data) {
             $("#result").html('');
             $.each(data, function(index, apartment) {
-              id = apartment.apartment_id;
+              var id = apartment.apartment_id;
+              
               $('#result').append('<header><div><h2>Apartment ID: ' + id
               +" "
-              + '<button type="button" onclick="nest()"> Details </button>'
+              + '<button type="button" id="btn_' + id + '"> Details </button>'
               + '</h2></div></header>' 
               + '<p class="body">Street_address: '+ apartment.street_address 
               + ', Zipcode: '+ apartment.zip + '</p>');
+              
+              $('#btn_' + id).click(() => {
+                var link_full = "/nest/"+id+"/fullNest";
+                var link_notFull = "/nest/"+id+"/notFullNest";
+                // TODO: May add btn for approve funtion and call other related API
+                // This is to render fullNest
+                  $.getJSON($SCRIPT_ROOT + link_full, function(data) {
+                      $("#result_nest").html('');
+                      $.each(data, function(index, full) {
+                        $('#result_nest').append('<header><div><h2>Full Nest ID: ' + full.nest_id
+                        + '</h2></div></header>' 
+                        + '<p class="body">Room Number: '+ full.room_number
+                        + ', User Number: '+ full.user_number + '</p>');
+                      });
+                  });
+                  // This is to render notFull Nests
+                  $.getJSON($SCRIPT_ROOT + link_notFull, function(data) {
+                      $("#result_nest").html('');
+                      $.each(data, function(index, notFull) {
+                        $('#result_nest').append('<header><div><h2>Not_Full Nest ID: ' + notFull.nest_id
+                        + '</h2></div></header>' 
+                        + '<p class="body">Room Number: '+ notFull.room_number
+                        + ', User Number: '+ notFull.user_number + '</p>');
+                      });
+                  });
+              });
             
             });
         });
-        // (function nest() {
-        //           var link = "/nest/"+id+"/fullNest";
-        //           $.getJSON($SCRIPT_ROOT + link, function(data) {
-        //               $("#result_nest").html('');
-        //               $.each(data, function(index, nest) {
-        //                 $('#result_nest').append('<header><div><h2>Nest ID: ' + nest
-        //                 + '</h2></div></header>' 
-        //                 + '<p class="body">Street_address: '
-        //                 + ', Zipcode: '+ '</p>');
-        //               });
-        //           });
-        //       });
     })
    
   </script>

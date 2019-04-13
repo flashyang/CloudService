@@ -3,13 +3,13 @@ from groupnest.db import get_db
 
 def test_login_required(client):
     response = client.post('reservation/create/nest_id/2')
-    assert response.headers['Location'] == 'http://localhost/auth'
+    assert response.headers['Location'] == 'http://localhost/auth/login'
 
     response = client.put('reservation/2/accept_offer')
-    assert response.headers['Location'] == 'http://localhost/auth'
+    assert response.headers['Location'] == 'http://localhost/auth/login'
 
     response = client.delete('reservation/2/delete')
-    assert response.headers['Location'] == 'http://localhost/auth'
+    assert response.headers['Location'] == 'http://localhost/auth/login'
 
 def test_author_required(app, client, auth):
 

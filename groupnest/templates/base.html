@@ -1,20 +1,30 @@
 <!doctype html>
-<title>{% block title %}{% endblock %} groupNest</title>
+<title>{% block title %}{% endblock %} - GroupNest</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 <nav>
-  <h1>Groupnest</h1>
+  <h1><a href="{{ url_for('index') }}">Groupnest</a></h1>
+  
   <ul>
     {% if g.user %}
-      <li><span>{{ g.user['username'] }}</span>
+      <li><span>Hello, {{ g.user['username'] }}</span>
+      <li><a href="{{ url_for('apartment.mylistings') }}">My Listings</a>
+      <li><a href="{{ url_for('apartment.myreservations') }}">My Reservations</a>
       <li><a href="{{ url_for('auth.logout') }}">Log Out</a>
     {% else %}
       <li><a href="{{ url_for('auth.register') }}">Register</a>
       <li><a href="{{ url_for('auth.login') }}">Log In</a>
     {% endif %}
+    <li><a href="{{ url_for('apartment.searchresult') }}">Search</a></li>
   </ul>
 </nav>
 <section class="content">
   <header>
+      <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+      <script>window.jQuery || document.write('<script src="{{ url_for('static', filename='jquery.js')}}">\x3C/script>')</script>
+      <script type=text/javascript>
+        $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+      </script>
+
     {% block header %}{% endblock %}
   </header>
   {% for message in get_flashed_messages() %}

@@ -9,6 +9,7 @@ from groupnest.db import get_db
 import logging
 import json
 import redis
+import re
 
 bp = Blueprint('apartment', __name__, url_prefix='/apartment')
 r = redis.Redis(#host='localhost',
@@ -53,14 +54,12 @@ def search():
     if error is not None:
         flash(error)
     elif cached_zip_result is not None:
-        # unpacked_result = r.get(zip)
         print(1)
-        # print(unpacked_result)
-        # return jsonify(unpacked_result)
         apartments = r.get(zip)
         cacheresult = apartments.decode('utf8').replace("'", '"')
-        print('cache result: ', cacheresult)
-        return cacheresult
+        cacheresult_re = re.sub('"created".*?\),', '', cacheresult)
+        print('cache result: ', cacheresult_re)
+        return cacheresult_re
     else:
         print(2)
         cursor.execute(

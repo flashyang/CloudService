@@ -47,7 +47,7 @@ def get_allNest(apartmentId):
 
 @bp.route('<int:apartmentId>/associatedNests')
 def get_associatedNests(apartmentId):
-    return render_template('nest/associatedNests.html')
+    return render_template('nest/associatedNests.html', apartmentId=apartmentId)
 
 # get all the nest objects associated with the given apartmentId
 

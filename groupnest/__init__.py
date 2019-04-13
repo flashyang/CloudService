@@ -1,7 +1,7 @@
 import os
 import urllib
 
-from flask import Flask
+from flask import Flask, render_template, request, jsonify
 import urllib
 
 
@@ -36,12 +36,6 @@ def create_app(test_config=None):
     app.config["DATABASE_USERNAME"] = url.username
     app.config["DATABASE_PASSWORD"] = url.password
     app.config["DATABASE_NAME"]     = url.path[1:]
-
-    url = urllib.parse.urlparse(os.environ['DATABASE_URL'])
-    app.config["DATABASE_HOSTNAME"] = url.hostname
-    app.config["DATABASE_USERNAME"] = url.username
-    app.config["DATABASE_PASSWORD"] = url.password
-    app.config["DATABASE_NAME"]     = url.path[1:]
     
     if test_config is None:
         # load the instance config, if it exists, when not testing
@@ -64,10 +58,6 @@ def create_app(test_config=None):
 
     from . import apartment
     app.register_blueprint(apartment.bp)
-    app.add_url_rule('/', endpoint='index', view_func=apartment.index)
-
-
-  
 
     from . import nest
     app.register_blueprint(nest.bp)
@@ -75,4 +65,10 @@ def create_app(test_config=None):
     from . import reservation
     app.register_blueprint(reservation.bp)
 
+    @app.route('/')
+    def index():
+        return render_template('home.html')
+
     return app
+
+    

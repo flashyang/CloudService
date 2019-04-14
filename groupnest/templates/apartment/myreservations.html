@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}My reservations{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+
+  <script type=text/javascript>
+    $(function() {
+        $.getJSON($SCRIPT_ROOT + '/apartment/reserveList',function(data) {
+          $("#result").html('<tr><th>- Reservation ID -</th><th>- nest id -</th><th>- created -</th><th>- accept_offer -</th></tr>');
+            $.each(data, function(index, apartment) {
+              var id = apartment.reservation_id
+                var accept = "Pending"
+                if (apartment.accept_offer == 1) accept = "accepted"
+              $('#result').append('<header><div><h2>Reservation ID: ' + id + '</h2></div></header>'
+            + '<p class="body">Nest ID: '+ apartment.nest_id
+            + ', Created in : '+ apartment.created  + '</p>'
+            + 'Accepted by landload? : '+ accept  + '</p>'
+                    + '</td><tr>'
+            );
+
+            });
+        });
+    })
+
+  </script>
+
+    <span><span id=result>
+    </span></span>
+
+{% endblock %}
+</section>

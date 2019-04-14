@@ -9,12 +9,14 @@
   <script type=text/javascript>
     $(function() {
         $.getJSON($SCRIPT_ROOT + '/apartment/ownerList',function(data) {
-          $("#result").html('<tr><th>Apartment ID</th><th>Street Address</th><th>ZipCode</th></tr>');
+          $("#result").html('<tr><th>Apartment ID</th><th>Street Address</th><th>ZipCode</th><th>FullNest</th><th>NotFullNest</th></tr>');
             $.each(data, function(index, apartment) {
               var id = apartment.apartment_id
-              $('#result').append('<tr><td>' + id 
-              + '<button type="button" id="btn_' + id + '">Details</button></td><td>'
+              var fullurl = $SCRIPT_ROOT  + '/nest/' + id + '/fullnest'
+              var notfullurl = $SCRIPT_ROOT  + '/nest/' + id + '/notfullnest'
+              $('#result').append('<tr><td>' + apartment.name + '</td><td>'
               + apartment.street_address +  '</td><td>' 
+<<<<<<< HEAD
               + apartment.zip + '</td></tr>');
               
               $('#btn_' + id).click(() => {
@@ -47,32 +49,16 @@
                   });
               });
             
+=======
+              + apartment.zip +  '</td><td>'
+              + "<a href='" + fullurl + "'>Get Full Nest</a></td><td>"
+              + "<a href='" + notfullurl + "'>Get Not Full nest</a></td><tr>");
+>>>>>>> d5c751aed3e14b3fffc40cd07932418f8caf2720
             });
         });
+        return false;
     })
-   
   </script>
- <!-- <p><input type=text size=5 name=zipcode>  <a href=# id=search> search by zipcode</a><p></p> -->
-    <span><span id=result>
-    </span></span>
-    
-    <!-- {% for apartment in result %} -->
-     <!-- <article class="apartment"> -->
-       <!-- <header> -->
-         <div>
-           <h1>apartment id: {{ apartment['apartment_id'] }}</h1>
-           <!-- <div class="about"> {{ apartment['street_address'] }} listed on {{ apartment['created'].strftime('%Y-%m-%d') }}</div> -->
-         </div>
-         <!-- {% if g.user['id'] == post['author_id'] %}
-           <a class="action" href="{{ url_for('blog.update', id=post['id']) }}">Edit</a>
-         {% endif %} -->
-       <!-- </header> -->
-       <p class="body">{{ apartment['sqft'] }}</p>
-     <!-- </article> -->
-     <!-- {% if not loop.last %}
-       <hr>
-     {% endif %}
-    
-   {% endfor %}  -->
+
+<div><table id=result></table></div>
 {% endblock %}
-</section>

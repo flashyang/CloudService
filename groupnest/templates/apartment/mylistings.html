@@ -15,7 +15,7 @@
               $('#result').append('<tr><td>' + id 
               + '<button type="button" id="btn_' + id + '">Details</button></td><td>'
               + apartment.street_address +  '</td><td>' 
-              + apartment.zip + '</td><tr>');
+              + apartment.zip + '</td></tr>');
               
               $('#btn_' + id).click(() => {
                 var link_full = "/nest/"+id+"/fullNest";

@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}My Listings{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+
+  <script type=text/javascript>
+    $(function() {
+        $.getJSON($SCRIPT_ROOT + '/apartment/ownerList',function(data) {
+          $("#result").html('<tr><th>Apartment ID</th><th>Street Address</th><th>ZipCode</th><th>FullNest</th><th>NotFullNest</th></tr>');
+            $.each(data, function(index, apartment) {
+              var id = apartment.apartment_id
+              var fullurl = $SCRIPT_ROOT  + '/nest/' + id + '/fullnest'
+              var notfullurl = $SCRIPT_ROOT  + '/nest/' + id + '/notfullnest'
+              $('#result').append('<tr><td>' + apartment.name + '</td><td>'
+              + apartment.street_address +  '</td><td>' 
+              + apartment.zip +  '</td><td>'
+              + "<a href='" + fullurl + "'>Get Full Nest</a></td><td>"
+              + "<a href='" + notfullurl + "'>Get Not Full nest</a></td><tr>");
+            });
+        });
+        return false;
+    })
+  </script>
+
+<div><table id=result></table></div>
+{% endblock %}

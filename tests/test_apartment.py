@@ -31,7 +31,7 @@ def test_search(client, auth, app):
 
    # TODO: May edit here because orginally return a html
     response = client.get('/apartment/search', data={'zip': ''})
-    assert b'Redirecting' in response.data
+    assert b' ' in response.data
 
 
 def test_delete_appartment(client, auth, app):

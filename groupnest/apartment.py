@@ -43,7 +43,7 @@ def search():
         # zip = request.form['zip']
 
     zip = request.args.get('zipcode', 0, type=int)
-    print("Search by zipcode: ", zip)
+    # print("Search by zipcode: ", zip)
 
     error = None
     if not zip:
@@ -54,14 +54,12 @@ def search():
     if error is not None:
         flash(error)
     elif cached_zip_result is not None:
-        print(1)
         apartments = r.get(zip)
         cacheresult = apartments.decode('utf8').replace("'", '"')
         cacheresult_re = re.sub('"created".*?\),', '', cacheresult)
-        print('cache result: ', cacheresult_re)
         return cacheresult_re
     else:
-        print(2)
+        # print(2)
         cursor.execute(
             'SELECT *'
             ' FROM apartment'
@@ -84,11 +82,7 @@ def search():
             #     item['sqft'] = apt['sqft']
             #     result.append(item)
             # return jsonify(result)
-            print('apartments')
-            print(apartments)
             json_result = jsonify(apartments)
-            print('json_result')
-            print(json_result)
             r.set(zip, apartments)
             r.expire(zip, 100)
             # return json_result
@@ -307,7 +301,7 @@ def get_ownerList():
     db = get_db()
     cursor = db.cursor()
     cursor.execute(
-        'SELECT a.name, a.street_address, a.price, username,room_number,bathroom_number,street_address,zip,city,state,price,sqft'
+        'SELECT a.name, a.street_address, a.price, username,room_number,bathroom_number,street_address,zip,city,state,price,sqft, apartment_id'
         ' FROM apartment a JOIN user u ON a.landlord_id = u.user_id'
         ' WHERE u.user_id = %s',
         (g.user['user_id'],)
@@ -321,6 +315,7 @@ def get_ownerList():
         apt = ownerList[index]
         item = {}
         item['name'] = apt['name']
+        item['apartment_id'] = apt['apartment_id']
         item['room_number'] = apt['room_number']
         item['bathroom_number'] = apt['bathroom_number']
         item['street_address'] = apt['street_address']

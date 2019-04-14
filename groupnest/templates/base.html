@@ -1,6 +1,10 @@
 <!doctype html>
+<html>
+<head>
 <title>{% block title %}{% endblock %} - GroupNest</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
 <nav>
   <h1><a href="{{ url_for('index') }}">Groupnest</a></h1>
   
@@ -18,17 +22,17 @@
   </ul>
 </nav>
 <section class="content">
-  <header>
       <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-      <script>window.jQuery || document.write('<script src="{{ url_for('static', filename='jquery.js') }}">\x3C/script>')</script>
+      <script>window.jQuery || document.write('<script src="{{ url_for('static', filename='jquery.js')}}">\x3C/script>')</script>
       <script type=text/javascript>
         $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
       </script>
 
     {% block header %}{% endblock %}
-  </header>
   {% for message in get_flashed_messages() %}
     <div class="flash">{{ message }}</div>
   {% endfor %}
   {% block content %}{% endblock %}
 </section>
+</body>
+</html>

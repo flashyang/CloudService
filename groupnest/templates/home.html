@@ -8,6 +8,7 @@
 <script type=text/javascript>
     $(function() {
         $.getJSON($SCRIPT_ROOT + '/apartment', {}, function(data) {
+            console.log(data);
           $("#result").html('<tr><th>Nest</th><th>Name</th><th>Bedroom</th><th>Bathroom</th><th>Address</th></tr>');
           $.each(data, function(index, apartment) {
             var local_url = $SCRIPT_ROOT + 'nest/' + apartment.apartment_id + '/associatedNests'
@@ -15,7 +16,7 @@
                 + apartment.name + '</td><td>' 
                 + apartment.room_number + '</td><td>' 
                 + apartment.bathroom_number + '</td><td>'
-                + apartment.street_address + ', ' + apartment.city + ', ' + apartment.state + ', ' + apartment.zip + '</td><tr>');
+                + apartment.street_address + ', ' + apartment.city + ', ' + apartment.state + ', ' + apartment.zip + '</td></tr>');
 				  });
         });
         return false;

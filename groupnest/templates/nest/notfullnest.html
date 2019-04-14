@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+<script type=text/javascript>
+    $(function() {
+        let url = $SCRIPT_ROOT + '/nest/' + {{apartmentId}} + '/notFullNest'
+        $.getJSON(url, {}, function(data) {
+          $("#result").html('<tr><th>Total Room</th><th>Registered Room</th></tr>');
+          $.each(data, function(index, nest) {
+            var local_url = '#'
+            $('#result').append(
+              '<tr><td>' + nest.room_number + '</td><td>' 
+              + nest.user_number + '</td><tr>');
+				  });
+        });
+        return false;
+    });
+  </script>
+
+<h1>Not Full Nest</h1>
+<div><table id=result></table></div>
+
+{% endblock %}

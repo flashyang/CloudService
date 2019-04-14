@@ -268,7 +268,7 @@ def create():
             )
             db.commit()
 
-            return redirect(url_for('apartment.index'))
+            return render_template('apartment/mylistings.html')
 
     return render_template('apartment/create.html')
 

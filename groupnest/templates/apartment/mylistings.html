@@ -16,44 +16,9 @@
               var notfullurl = $SCRIPT_ROOT  + '/nest/' + id + '/notfullnest'
               $('#result').append('<tr><td>' + apartment.name + '</td><td>'
               + apartment.street_address +  '</td><td>' 
-<<<<<<< HEAD
-              + apartment.zip + '</td></tr>');
-              
-              $('#btn_' + id).click(() => {
-                var link_full = "/nest/"+id+"/fullNest";
-                var link_notFull = "/nest/"+id+"/notFullNest";
-                // TODO: May add btn for approve funtion and call other related API
-                // This is to render fullNest
-                  $.getJSON($SCRIPT_ROOT + link_full, function(data) {
-                      $("#result").append(
-                        "<header><div><h3>Full Nests infor for Apartment_ID: "+ id);
-                      $.each(data, function(index, full) {
-                        $('#result').append('<header><div><h4>Full Nest ID: ' + full.nest_id
-                        + '</h2></div></header>' 
-                        + '<p class="body">Room Number: '+ full.room_number
-                        + ', User Number: '+ full.user_number + '</p>');
-                      });
-                  });
-                  // This is to render notFull Nests
-                  $.getJSON($SCRIPT_ROOT + link_notFull, function(data) {
-                    $("#result").append("------------------------------------------------------------------");
-                    $("#result").append(
-                        "<header><div><h3>Not Full Nests for ApartmentID: "+ id);
-                      $.each(data, function(index, notFull) {
-                        $('#result').append('<header><div><h4>Not_Full Nest ID: ' + notFull.nest_id
-                        + '</h2></div></header>' 
-                        + '<p class="body">Room Number: '+ notFull.room_number
-                        + ', User Number: '+ notFull.user_number + '</p>');
-                      });
-                    $("#result").append("-----------------------------------------------------------------");
-                  });
-              });
-            
-=======
               + apartment.zip +  '</td><td>'
               + "<a href='" + fullurl + "'>Get Full Nest</a></td><td>"
               + "<a href='" + notfullurl + "'>Get Not Full nest</a></td><tr>");
->>>>>>> d5c751aed3e14b3fffc40cd07932418f8caf2720
             });
         });
         return false;

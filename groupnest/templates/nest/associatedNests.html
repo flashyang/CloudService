@@ -11,9 +11,9 @@
             $('#result').append(
               '<tr><td>' + nest.room_number + '</td><td>' 
               + nest.user_number + '</td><td>'
-              + "<button id=reservation>Make reservation</butt></td><tr>");
+              + '<button id="reservation' + nest.nest_id + '">Make reservation</butt></td><tr>');
             var local_url = $SCRIPT_ROOT + '/reservation/create/nest_id/' + nest.nest_id
-            $('#reservation').bind('click', function() {
+            $('#reservation' + nest.nest_id).bind('click', function() {
               $.post(local_url, {}, function( data ) {});
             });
 				  });

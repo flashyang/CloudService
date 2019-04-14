@@ -13,11 +13,11 @@
               '<tr><td>' + nest.room_number + '</td><td>' 
               + nest.user_number + '</td><td>'
               + nest.status + '</td><td>' 
-              + "<button id=approve>Approve</button>   <button id=reject>Reject</button></td><tr>");
-            $('#approve').bind('click', function() {
+              + '<button id="approve' + nest.nest_id + '">Approve</button>   <button id="reject' + nest.nest_id + '">Reject</button></td><tr>');
+            $('#approve' + nest.nest_id).bind('click', function() {
               $.post(local_url, {decision: 'APPROVED'}, function( data ) {});
             });
-            $('#reject').bind('click', function() {
+            $('#reject' + nest.nest_id).bind('click', function() {
               $.post(local_url, {decision: 'REJECTED'}, function( data ) {});
             });
 				  });

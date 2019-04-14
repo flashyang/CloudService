@@ -9,7 +9,7 @@
   <script type=text/javascript>
     $(function() {
         $.getJSON($SCRIPT_ROOT + '/apartment/ownerList',function(data) {
-          $("#result").html('<tr><th>Apartment ID</th><th>Street Address</th><th>ZipCode</th><th>FullNest</th><th>NotFullNest</th></tr>');
+          $("#result").html('<tr><th>Apartment Name</th><th>Street Address</th><th>ZipCode</th><th>FullNest</th><th>NotFullNest</th></tr>');
             $.each(data, function(index, apartment) {
               var id = apartment.apartment_id
               var fullurl = $SCRIPT_ROOT  + '/nest/' + id + '/fullnest'

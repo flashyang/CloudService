@@ -9,70 +9,21 @@
   <script type=text/javascript>
     $(function() {
         $.getJSON($SCRIPT_ROOT + '/apartment/ownerList',function(data) {
-          $("#result").html('<tr><th>Apartment ID</th><th>Street Address</th><th>ZipCode</th></tr>');
+          $("#result").html('<tr><th>Apartment ID</th><th>Street Address</th><th>ZipCode</th><th>FullNest</th><th>NotFullNest</th></tr>');
             $.each(data, function(index, apartment) {
               var id = apartment.apartment_id
-              $('#result').append('<tr><td>' + id 
-              + '<button type="button" id="btn_' + id + '">Details</button></td><td>'
+              var fullurl = $SCRIPT_ROOT  + '/nest/' + id + '/fullnest'
+              var notfullurl = $SCRIPT_ROOT  + '/nest/' + id + '/notfullnest'
+              $('#result').append('<tr><td>' + apartment.name + '</td><td>'
               + apartment.street_address +  '</td><td>' 
-              + apartment.zip + '</td><tr>');
-              
-              $('#btn_' + id).click(() => {
-                var link_full = "/nest/"+id+"/fullNest";
-                var link_notFull = "/nest/"+id+"/notFullNest";
-                // TODO: May add btn for approve funtion and call other related API
-                // This is to render fullNest
-                  $.getJSON($SCRIPT_ROOT + link_full, function(data) {
-                      $("#result").append(
-                        "<header><div><h3>Full Nests infor for Apartment_ID: "+ id);
-                      $.each(data, function(index, full) {
-                        $('#result').append('<header><div><h4>Full Nest ID: ' + full.nest_id
-                        + '</h2></div></header>' 
-                        + '<p class="body">Room Number: '+ full.room_number
-                        + ', User Number: '+ full.user_number + '</p>');
-                      });
-                  });
-                  // This is to render notFull Nests
-                  $.getJSON($SCRIPT_ROOT + link_notFull, function(data) {
-                    $("#result").append("------------------------------------------------------------------");
-                    $("#result").append(
-                        "<header><div><h3>Not Full Nests for ApartmentID: "+ id);
-                      $.each(data, function(index, notFull) {
-                        $('#result').append('<header><div><h4>Not_Full Nest ID: ' + notFull.nest_id
-                        + '</h2></div></header>' 
-                        + '<p class="body">Room Number: '+ notFull.room_number
-                        + ', User Number: '+ notFull.user_number + '</p>');
-                      });
-                    $("#result").append("-----------------------------------------------------------------");
-                  });
-              });
-            
+              + apartment.zip +  '</td><td>'
+              + "<a href='" + fullurl + "'>Get Full Nest</a></td><td>"
+              + "<a href='" + notfullurl + "'>Get Not Full nest</a></td><tr>");
             });
         });
+        return false;
     })
-   
   </script>
- <!-- <p><input type=text size=5 name=zipcode>  <a href=# id=search> search by zipcode</a><p></p> -->
-    <span><span id=result>
-    </span></span>
-    
-    <!-- {% for apartment in result %} -->
-     <!-- <article class="apartment"> -->
-       <!-- <header> -->
-         <div>
-           <h1>apartment id: {{ apartment['apartment_id'] }}</h1>
-           <!-- <div class="about"> {{ apartment['street_address'] }} listed on {{ apartment['created'].strftime('%Y-%m-%d') }}</div> -->
-         </div>
-         <!-- {% if g.user['id'] == post['author_id'] %}
-           <a class="action" href="{{ url_for('blog.update', id=post['id']) }}">Edit</a>
-         {% endif %} -->
-       <!-- </header> -->
-       <p class="body">{{ apartment['sqft'] }}</p>
-     <!-- </article> -->
-     <!-- {% if not loop.last %}
-       <hr>
-     {% endif %}
-    
-   {% endfor %}  -->
+
+<div><table id=result></table></div>
 {% endblock %}
-</section>

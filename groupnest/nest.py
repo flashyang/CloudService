@@ -21,7 +21,6 @@ app = Flask(__name__)
 @bp.route('/<int:apartmentId>/fullNest')
 def get_fullNest(apartmentId):
     fullNest = fullNest_helper(apartmentId)
-
     return jsonify(fullNest)
 
 # Given apartmentId, get all associated nest information for the nests that are not full 
@@ -48,6 +47,14 @@ def get_allNest(apartmentId):
 @bp.route('<int:apartmentId>/associatedNests')
 def get_associatedNests(apartmentId):
     return render_template('nest/associatedNests.html', apartmentId=apartmentId)
+
+@bp.route('<int:apartmentId>/fullnest')
+def get_associatedfullnest(apartmentId):
+    return render_template('nest/fullnest.html', apartmentId=apartmentId)
+
+@bp.route('<int:apartmentId>/notfullnest')
+def get_associatednotfullnest(apartmentId):
+    return render_template('nest/notfullnest.html', apartmentId=apartmentId)
 
 # get all the nest objects associated with the given apartmentId
 
@@ -91,6 +98,7 @@ def fullNest_helper(apartmentId):
             item['room_number'] = res['room_number']
             item['user_number'] = res['user_number']
             item['nest_id'] = nest['nest_id']
+            item['status'] = nest['status']
             result.append(item)
 
     return result
@@ -113,7 +121,6 @@ def notFullNest_helper(apartmentId):
             item['user_number'] = res['user_number']
             item['nest_id'] = nest['nest_id']
             result.append(item)
-
     return result
 
 # Given nestId, get number of room in the associated apartment and number of reservations alive
@@ -268,7 +275,6 @@ def create(apartmentId):
     apartment = cursor.fetchone()
 
     logging.info('fetch apartment with Id %s', apartmentId)
-
     if apartment is None:
 
         logging.error('%s not found', apartmentId)
@@ -320,7 +326,7 @@ def create(apartmentId):
 
             logging.info('reservation created for user %s and nest %s', g.user['user_id'], nest_id)
 
-            return redirect(url_for('nest.nestUser', nestId=nest_id))
+            return render_template('nest/associatedNests.html', apartmentId=apartmentId)
 
     return render_template('nest/create.html')
 

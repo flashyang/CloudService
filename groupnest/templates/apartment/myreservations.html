@@ -48,23 +48,60 @@
                 i++;
               document.getElementById(button3).disabled = button1;
               document.getElementById(button4).disabled = button2;
+               var local_urlC = $SCRIPT_ROOT + '/reservation/'+reservationID+'/accept_offer'
+              var local_urlC2 = $SCRIPT_ROOT + '/reservation/'+reservationID+'/delete'
+            $('#button3'+i).click(function () {
+                $.ajax({
+                type: "PUT",
+                url: local_urlC,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: OnSucces,
+                error: OnError
             });
-        });
+                function OnSucces(response) {
+                    if (response == 1) {
+                        alert('Category Added Successfully !!!');
+                        reset();
+                    }
+                    else {
+                        alert(response);
+                    }
+                }
+                function OnError(response) {
+                    alert(response);
+                                    }
+                    });
+              $('#button4'+i).click(function () {
+                $.ajax({
+                type: "DELETE",
+                url: local_urlC2,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: OnSucces,
+                error: OnError
+            });
+                function OnSucces(response) {
+                    if (response == 1) {
+                        alert('Category Added Successfully !!!');
+                        reset();
+                    }
+                    else {
+                        alert(response);
+                    }
+                }
+                function OnError(response) {
+                    alert(response);
+                                    }
+                    });
+            i++;});
+            });
         return false;
     })
-      $(document).ready(function() {
-            var btn = document.getElementById("button3");
-            if (textstatusmodal.value == "Tidak Diluluskan") {
-            btn.disabled=true;
-      } else {
-        if(textstatusmodal.value == "Proses") {
-          btn.disabled=false;
-        }
-      }
-});
 
   </script>
 
 <div><table id=result></table></div>
 <br></br>
 {% endblock %}
+

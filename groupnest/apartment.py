@@ -358,9 +358,38 @@ def get_reservations():
         item['nest_id'] = apt['nest_id']
         item['created'] = apt['created']
         item['accept_offer'] = apt['accept_offer']
+        nest = get_nest(apt['nest_id'])
+        item['apartment_id'] = nest['apartment_id']
+        item['status'] = nest['status']
+        aptDetails = get_apartment(nest['apartment_id'])
+        item['name'] = aptDetails['name']
         result.append(item)
+
+    print("result")
+    print(result)
+    print("result")
     return jsonify(result)
 
 @bp.route('/myreservations')
 def myreservations():
     return render_template('apartment/myreservations.html')
+
+'''
+Return the nest for a given nest id.
+'''
+def get_nest(nest_id):
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute(
+        """SELECT *
+        FROM nest
+        WHERE nest_id = %s""",
+        (nest_id,)
+    )
+    nest = cursor.fetchone()
+
+    if nest is None:
+        abort(404, "Nest id {0} doesn't exist.".format(nest_id))
+
+    return nest
+

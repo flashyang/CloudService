@@ -1,41 +1,70 @@
-
 {% extends 'base.html' %}
 
+{% block header %}
+  <h1>{% block title %}My Listings{% endblock %}</h1>
+{% endblock %}
 
 {% block content %}
-<script type=text/javascript>
-    $(function() {
-        let url = $SCRIPT_ROOT + '/apartment/reserveList'
-        $.getJSON(url, function(data) {
-          $("#result").html('<tr><th>Reservation ID</th><th>Apartment Name</th><th>Nest ID</th><th>Nest Status</th><th>Action</th></tr>');
-          $.each(data, function(index, apartment) {
-              var id = apartment.reservation_id
-              console.log("apartment")
-              console.log(apartment)
-              console.log("apartment")
-              var apt_name = apartment.name1
-              var nid = apartment.nest_id
-              var nest_status = apartment.status
 
-            $('#result').append(
-              '<tr><td>' + id + '</td>' +
-                '<td><button id="aptname">apt_name</butt></td>' +
-                '<td><button id="nestid">nid</butt></td>'+
-                    '<td>' + nest_status + '</td></tr>'
-{#                {% block if %}#}
-{#                {% if nest_status == 'PENDING' %}#}
-{#                    '<td> <button type="button">Cancel</butt> </td></tr>'#}
-{#                {% elif nest_status == 'REJECTED' %}#}
-{#                    '<td><button type="button" disabled>Cancel</butt>  </td></tr>'#}
-{#                {% else nest_status == 'APPROVED' %}#}
-{#                    '<td><button type="button">Accept</butt>  </td></tr>'#}
-{#              {% endif %}#}
-            );
+  <script type=text/javascript>
+
+    $(function() {
+        $.getJSON($SCRIPT_ROOT + '/apartment/reserveList',function(data) {
+          $("#result").html('<tr><th>Reservation ID</th><th>Apt Name</th><th>Nest ID</th><th>Status</th><th>Action</th></tr>');
+          var button1 = true;
+                var button2 = true;
+                var i = 0;
+            $.each(data, function(index, apartment) {
+              var id = apartment.apartment_id
+                   button1 = true;
+                   button2 = true;
+
+                var button3 = "button3"+i
+                var button4 = "button4"+i
+
+              if (apartment.status == "PENDING"){
+                  button2 = false
+
+              } else if (apartment.status == "REJECTED"){
+
+              } else {
+                  button1 = false;
+                  button2 = false;
+              }
+              var fullurl = $SCRIPT_ROOT  + '/apartment/' + id + '/fullnest'
+              var notfullurl = $SCRIPT_ROOT  + '/nest/' + id + '/notfullnest'
+              $('#result').append('<tr>' +
+                      '<td>' + apartment.reservation_id + '</td>'+
+                      '<td>' + "<a href='" + fullurl + "'>"+apartment.name+"</a></td><td>"
+                      + "<a href='" + fullurl + "'>"+apartment.nest_id+"</a></td><td>"
+              + apartment.status +  '</td><td>'+
+                      '<button id="button3" type="submit" class="accpet-button">Accept</button></td><td>'+
+                      '<button id="button4" class="cancel-button" data-dismiss="modal">Cancel</button></td>'
+                  +"</tr>");
+              var ele = document.getElementById('button3');
+                ele.id="button3"+i;
+                var ele = document.getElementById('button4');
+                ele.id="button4"+i;
+                i++;
+              document.getElementById(button3).disabled = button1;
+              document.getElementById(button4).disabled = button2;
+            });
         });
-    })});
+        return false;
+    })
+      $(document).ready(function() {
+            var btn = document.getElementById("button3");
+            if (textstatusmodal.value == "Tidak Diluluskan") {
+            btn.disabled=true;
+      } else {
+        if(textstatusmodal.value == "Proses") {
+          btn.disabled=false;
+        }
+      }
+});
+
   </script>
 
-<h1>My Reservations</h1>
 <div><table id=result></table></div>
-
+<br></br>
 {% endblock %}

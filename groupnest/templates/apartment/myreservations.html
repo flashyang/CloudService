@@ -1,34 +1,41 @@
+
 {% extends 'base.html' %}
 
-{% block header %}
-  <h1>{% block title %}My reservations{% endblock %}</h1>
-{% endblock %}
 
 {% block content %}
-
-  <script type=text/javascript>
+<script type=text/javascript>
     $(function() {
-        $.getJSON($SCRIPT_ROOT + '/apartment/reserveList',function(data) {
-          $("#result").html('<tr><th>- Reservation ID -</th><th>- nest id -</th><th>- created -</th><th>- accept_offer -</th></tr>');
-            $.each(data, function(index, apartment) {
+        let url = $SCRIPT_ROOT + '/apartment/reserveList'
+        $.getJSON(url, function(data) {
+          $("#result").html('<tr><th>Reservation ID</th><th>Apartment Name</th><th>Nest ID</th><th>Nest Status</th><th>Action</th></tr>');
+          $.each(data, function(index, apartment) {
               var id = apartment.reservation_id
-                var accept = "Pending"
-                if (apartment.accept_offer == 1) accept = "accepted"
-              $('#result').append('<header><div><h2>Reservation ID: ' + id + '</h2></div></header>'
-            + '<p class="body">Nest ID: '+ apartment.nest_id
-            + ', Created in : '+ apartment.created  + '</p>'
-            + 'Accepted by landload? : '+ accept  + '</p>'
-                    + '</td><tr>'
+              console.log("apartment")
+              console.log(apartment)
+              console.log("apartment")
+              var apt_name = apartment.name1
+              var nid = apartment.nest_id
+              var nest_status = apartment.status
+
+            $('#result').append(
+              '<tr><td>' + id + '</td>' +
+                '<td><button id="aptname">apt_name</butt></td>' +
+                '<td><button id="nestid">nid</butt></td>'+
+                    '<td>' + nest_status + '</td></tr>'
+{#                {% block if %}#}
+{#                {% if nest_status == 'PENDING' %}#}
+{#                    '<td> <button type="button">Cancel</butt> </td></tr>'#}
+{#                {% elif nest_status == 'REJECTED' %}#}
+{#                    '<td><button type="button" disabled>Cancel</butt>  </td></tr>'#}
+{#                {% else nest_status == 'APPROVED' %}#}
+{#                    '<td><button type="button">Accept</butt>  </td></tr>'#}
+{#              {% endif %}#}
             );
-
-            });
         });
-    })
-
+    })});
   </script>
 
-    <span><span id=result>
-    </span></span>
+<h1>My Reservations</h1>
+<div><table id=result></table></div>
 
 {% endblock %}
-</section>

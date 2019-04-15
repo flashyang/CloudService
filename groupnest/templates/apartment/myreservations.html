@@ -18,13 +18,14 @@
               var id = apartment.apartment_id
                    button1 = true;
                    button2 = true;
-
+                reservationID = apartment.reservation_id
                 var button3 = "button3"+i
                 var button4 = "button4"+i
-
-              if (apartment.status == "PENDING"){
+                if (apartment.accept_offer == 1){
+                  button1 = true;
+                  button2 = true;
+                }  else if (apartment.status == "PENDING"){
                   button2 = false
-
               } else if (apartment.status == "REJECTED"){
 
               } else {
@@ -45,12 +46,14 @@
                 ele.id="button3"+i;
                 var ele = document.getElementById('button4');
                 ele.id="button4"+i;
-                i++;
+
               document.getElementById(button3).disabled = button1;
               document.getElementById(button4).disabled = button2;
-               var local_urlC = $SCRIPT_ROOT + '/reservation/'+reservationID+'/accept_offer'
+              var local_urlC = $SCRIPT_ROOT + '/reservation/'+reservationID+'/accept_offer'
               var local_urlC2 = $SCRIPT_ROOT + '/reservation/'+reservationID+'/delete'
-            $('#button3'+i).click(function () {
+                console.log(local_urlC)
+                console.log(local_urlC2)
+              $('#button3'+i).click(function () {
                 $.ajax({
                 type: "PUT",
                 url: local_urlC,
@@ -61,16 +64,18 @@
             });
                 function OnSucces(response) {
                     if (response == 1) {
-                        alert('Category Added Successfully !!!');
-                        reset();
+                        {#alert('Category Added Successfully !!!');#}
+                        {#reset();#}
+                        location.reload();
                     }
                     else {
-                        alert(response);
+                        location.reload();
+                        {#alert(response);#}
                     }
                 }
                 function OnError(response) {
-                    alert(response);
-                                    }
+                    {#alert(response);#}
+                          location.reload();          }
                     });
               $('#button4'+i).click(function () {
                 $.ajax({
@@ -83,15 +88,18 @@
             });
                 function OnSucces(response) {
                     if (response == 1) {
-                        alert('Category Added Successfully !!!');
-                        reset();
+                        {#alert('Category Added Successfully !!!');#}
+                        {#reset();#}
+                        location.reload();
                     }
                     else {
-                        alert(response);
+                        location.reload();
+                        {#alert(response);#}
                     }
                 }
                 function OnError(response) {
-                    alert(response);
+                    {#alert(response);#}
+                    location.reload();
                                     }
                     });
             i++;});
@@ -104,4 +112,3 @@
 <div><table id=result></table></div>
 <br></br>
 {% endblock %}
-

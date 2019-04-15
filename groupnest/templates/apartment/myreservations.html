@@ -31,12 +31,12 @@
                   button1 = false;
                   button2 = false;
               }
-              var fullurl = $SCRIPT_ROOT  + '/apartment/' + id + '/fullnest'
-              var notfullurl = $SCRIPT_ROOT  + '/nest/' + id + '/notfullnest'
+              var fullurl = $SCRIPT_ROOT  + '/apartment/' + id + '/browse'
+              var nesturl = $SCRIPT_ROOT  + '/nest/' + apartment.nest_id + ''
               $('#result').append('<tr>' +
                       '<td>' + apartment.reservation_id + '</td>'+
                       '<td>' + "<a href='" + fullurl + "'>"+apartment.name+"</a></td><td>"
-                      + "<a href='" + fullurl + "'>"+apartment.nest_id+"</a></td><td>"
+                      + "<a href='" + nesturl + "'>"+apartment.nest_id+"</a></td><td>"
               + apartment.status +  '</td><td>'+
                       '<button id="button3" type="submit" class="accpet-button">Accept</button></td><td>'+
                       '<button id="button4" class="cancel-button" data-dismiss="modal">Cancel</button></td>'
@@ -51,17 +51,7 @@
             });
         });
         return false;
-    })
-      $(document).ready(function() {
-            var btn = document.getElementById("button3");
-            if (textstatusmodal.value == "Tidak Diluluskan") {
-            btn.disabled=true;
-      } else {
-        if(textstatusmodal.value == "Proses") {
-          btn.disabled=false;
-        }
-      }
-});
+    });
 
   </script>
 

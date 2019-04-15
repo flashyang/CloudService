@@ -6,11 +6,16 @@
     $(function() {
         let url = $SCRIPT_ROOT + '/nest/' + {{apartmentId}} + '/notFullNest'
         $.getJSON(url, {}, function(data) {
-          $("#result").html('<tr><th>Total Room</th><th>Registered Room</th><th>Join</th></tr>');
+          $("#result").html('<tr><th>Total Room</th><th>Registered Room</th><th>Registered Users</th><th>Join</th></tr>');
           $.each(data, function(index, nest) {
+            var userlist = ''
+            $.each(nest.users, function(index, user) {
+              userlist = userlist + user.username + ' '
+            });
             $('#result').append(
               '<tr><td>' + nest.room_number + '</td><td>' 
               + nest.user_number + '</td><td>'
+              + userlist + '</td><td>'
               + '<button id="reservation' + nest.nest_id + '">Make reservation</butt></td></tr>');
             var local_url = $SCRIPT_ROOT + '/reservation/create/nest_id/' + nest.nest_id
             $('#reservation' + nest.nest_id).bind('click', function() {

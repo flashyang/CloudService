@@ -6,13 +6,18 @@
     $(function() {
         let url = $SCRIPT_ROOT + '/nest/' + {{apartmentId}} + '/fullNest'
         $.getJSON(url, {}, function(data) {
-          $("#result").html('<tr><th>Total Room</th><th>Registered Room</th><th>Status</th><th>Decision</th></tr>');
+          $("#result").html('<tr><th>Total Room</th><th>Registered Room</th><th>Status</th><th>Registered Users</th><th>Decision</th></tr>');
           $.each(data, function(index, nest) {
+            var userlist = ''
+            $.each(nest.users, function(index, user) {
+              userlist = userlist + user.username + ' '
+            });
             var local_url = $SCRIPT_ROOT + '/nest/' + nest.nest_id + '/update'
             $('#result').append(
               '<tr><td>' + nest.room_number + '</td><td>' 
               + nest.user_number + '</td><td>'
               + nest.status + '</td><td>' 
+              + userlist + '</td><td>'
               + '<button id="approve' + nest.nest_id + '">Approve</button>   <button id="reject' + nest.nest_id + '">Reject</button></td><tr>');
             $('#approve' + nest.nest_id).bind('click', function() {
               $.post(local_url, {decision: 'APPROVED'}, function( data ) {});

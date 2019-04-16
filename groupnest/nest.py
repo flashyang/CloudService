@@ -99,6 +99,7 @@ def fullNest_helper(apartmentId):
             item['user_number'] = res['user_number']
             item['nest_id'] = nest['nest_id']
             item['status'] = nest['status']
+            item['users'] = get_nestUser(nest['nest_id'])
             result.append(item)
 
     return result
@@ -120,6 +121,7 @@ def notFullNest_helper(apartmentId):
             item['room_number'] = res['room_number']
             item['user_number'] = res['user_number']
             item['nest_id'] = nest['nest_id']
+            item['users'] = get_nestUser(nest['nest_id'])
             result.append(item)
     return result
 
@@ -155,7 +157,7 @@ def get_nestUser(nestId):
     db = get_db()
     cursor = db.cursor()
     cursor.execute(
-        """SELECT username, first_name, last_name, email, gender, description
+        """SELECT username, first_name, last_name, email, gender, description, u.user_id
         FROM reservation p JOIN user u ON p.tenant_id = u.user_id
         WHERE p.nest_id = %s
         ORDER BY created DESC""",

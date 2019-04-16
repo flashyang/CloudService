@@ -421,6 +421,3 @@ def update(nestId):
         #abort(200, 'updated nest status')
 
     return redirect(url_for('nest.nestUser', nestId=nestId))
-
-
-# TODO: check input valid(id) && error handeling && log, unit test; API doc; database; cache; pipeline;

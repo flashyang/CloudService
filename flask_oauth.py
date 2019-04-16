@@ -11,10 +11,14 @@
 import httplib2
 from functools import wraps
 <<<<<<< HEAD
+<<<<<<< HEAD
 import urllib.parse #test
 =======
 from urllib.parse import urljoin
 >>>>>>> 111283181df454c00fb7bad36e4a282b0a820fdd
+=======
+import urllib.parse
+>>>>>>> master
 from flask import request, session, json, redirect, Response
 from werkzeug import url_decode, url_encode, url_quote, \
      parse_options_header, Headers

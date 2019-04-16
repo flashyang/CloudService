@@ -12,10 +12,9 @@ import redis
 import re
 
 bp = Blueprint('apartment', __name__, url_prefix='/apartment')
-r = redis.Redis(#host='localhost',
+r = redis.Redis(
                 host='ec2-18-220-62-128.us-east-2.compute.amazonaws.com',
                 port=6379,
-                #password='12345678901234567890',
                 )
 
 
@@ -39,8 +38,6 @@ def index():
 def search():
     db = get_db()
     cursor = db.cursor()
-    # if request.method == 'POST':
-	        # zip = request.form['zip']
 	
     zip = request.args.get('zipcode', 0, type=int)
 
@@ -53,10 +50,6 @@ def search():
     if error is not None:
         flash(error)
     elif cached_zip_result is not None:
-        # unpacked_result = r.get(zip)
-        print(1)
-        # print(unpacked_result)
-        # return jsonify(unpacked_result)
         apartments = r.get(zip)
         cacheresult = apartments.decode('utf8').replace("'", '"')
         cacheresult_re = re.sub('"created".*?\),', '', cacheresult)
@@ -73,19 +66,6 @@ def search():
         )
         apartments = cursor.fetchall()
         if apartments:
-            # for index in range(len(apartments)):
-            #     apt = apartments[index]
-            #     item = {}
-            #     item['name'] = apt['name']
-            #     item['room_number'] = apt['room_number']
-            #     item['bathroom_number'] = apt['bathroom_number']
-            #     item['zip'] = apt['zip']
-            #     item['city'] = apt['city']
-            #     item['state'] = apt['state']
-            #     item['price'] = apt['price']
-            #     item['sqft'] = apt['sqft']
-            #     result.append(item)
-            # return jsonify(result)
             print('apartments')
             print(apartments)
             json_result = jsonify(apartments)
@@ -95,10 +75,9 @@ def search():
             r.expire(zip, 100)
             # return json_result
             return jsonify(apartments)
-        # else:
-        #     abort(404,
-        #             "No such apartment matching given zipcode exists in our databse. Sorry! :(")
-    # return redirect(url_for('apartment.index'))
+        else:
+            abort(404,
+                    "No such apartment matching given zipcode exists in our databse. Sorry! :(")
     return jsonify([])
 
 # Get a apartment by apartmentId
@@ -120,9 +99,6 @@ def get_apartment(apartmentId, check_user=True):
 
     if apartment is None:
         abort(404, "Apartment id {0} doesn't exist.".format(apartmentId))
-
-    # if check_user and apartment['landlord_id'] != g.user['user_id']:
-    #     abort(403, "You can only modify your own apartment.")
 
     return apartment
 

@@ -1,34 +1,114 @@
 {% extends 'base.html' %}
 
 {% block header %}
-  <h1>{% block title %}My reservations{% endblock %}</h1>
+  <h1>{% block title %}My Listings{% endblock %}</h1>
 {% endblock %}
 
 {% block content %}
 
   <script type=text/javascript>
+
     $(function() {
         $.getJSON($SCRIPT_ROOT + '/apartment/reserveList',function(data) {
-          $("#result").html('<tr><th>- Reservation ID -</th><th>- nest id -</th><th>- created -</th><th>- accept_offer -</th></tr>');
+          $("#result").html('<tr><th>Reservation ID</th><th>Apt Name</th><th>Nest ID</th><th>Status</th><th>Action</th></tr>');
+          var button1 = true;
+                var button2 = true;
+                var i = 0;
             $.each(data, function(index, apartment) {
-              var id = apartment.reservation_id
-                var accept = "Pending"
-                if (apartment.accept_offer == 1) accept = "accepted"
-              $('#result').append('<header><div><h2>Reservation ID: ' + id + '</h2></div></header>'
-            + '<p class="body">Nest ID: '+ apartment.nest_id
-            + ', Created in : '+ apartment.created  + '</p>'
-            + 'Accepted by landload? : '+ accept  + '</p>'
-                    + '</td><tr>'
-            );
+              var id = apartment.apartment_id
+                   button1 = true;
+                   button2 = true;
+                reservationID = apartment.reservation_id
+                var button3 = "button3"+i
+                var button4 = "button4"+i
+                if (apartment.accept_offer == 1){
+                  button1 = true;
+                  button2 = true;
+                }  else if (apartment.status == "PENDING"){
+                  button2 = false
+              } else if (apartment.status == "REJECTED"){
 
+              } else {
+                  button1 = false;
+                  button2 = false;
+              }
+              var fullurl = $SCRIPT_ROOT  + '/apartment/' + id + '/browse'
+              var nesturl = $SCRIPT_ROOT  + '/nest/' + apartment.nest_id + ''
+              $('#result').append('<tr>' +
+                      '<td>' + apartment.reservation_id + '</td>'+
+                      '<td>' + "<a href='" + fullurl + "'>"+apartment.name+"</a></td><td>"
+                      + "<a href='" + nesturl + "'>"+apartment.nest_id+"</a></td><td>"
+              + apartment.status +  '</td><td>'+
+                      '<button id="button3" type="submit" class="accpet-button">Accept</button></td><td>'+
+                      '<button id="button4" class="cancel-button" data-dismiss="modal">Cancel</button></td>'
+                  +"</tr>");
+              var ele = document.getElementById('button3');
+                ele.id="button3"+i;
+                var ele = document.getElementById('button4');
+                ele.id="button4"+i;
+
+              document.getElementById(button3).disabled = button1;
+              document.getElementById(button4).disabled = button2;
+              var local_urlC = $SCRIPT_ROOT + '/reservation/'+reservationID+'/accept_offer'
+              var local_urlC2 = $SCRIPT_ROOT + '/reservation/'+reservationID+'/delete'
+                console.log(local_urlC)
+                console.log(local_urlC2)
+              $('#button3'+i).click(function () {
+                $.ajax({
+                type: "PUT",
+                url: local_urlC,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: OnSucces,
+                error: OnError
             });
-        });
+                function OnSucces(response) {
+                    if (response == 1) {
+                        {#alert('Category Added Successfully !!!');#}
+                        {#reset();#}
+                        location.reload();
+                    }
+                    else {
+                        location.reload();
+                        {#alert(response);#}
+                    }
+                }
+                function OnError(response) {
+                    {#alert(response);#}
+                          location.reload();          }
+                    });
+              $('#button4'+i).click(function () {
+                $.ajax({
+                type: "DELETE",
+                url: local_urlC2,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: OnSucces,
+                error: OnError
+            });
+                function OnSucces(response) {
+                    if (response == 1) {
+                        {#alert('Category Added Successfully !!!');#}
+                        {#reset();#}
+                        location.reload();
+                    }
+                    else {
+                        location.reload();
+                        {#alert(response);#}
+                    }
+                }
+                function OnError(response) {
+                    {#alert(response);#}
+                    location.reload();
+                                    }
+                    });
+            i++;});
+            });
+        return false;
     })
 
   </script>
 
-    <span><span id=result>
-    </span></span>
-
+<div><table id=result></table></div>
+<br></br>
 {% endblock %}
-</section>

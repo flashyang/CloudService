@@ -40,10 +40,9 @@ def search():
     db = get_db()
     cursor = db.cursor()
     # if request.method == 'POST':
-        # zip = request.form['zip']
-
+	        # zip = request.form['zip']
+	
     zip = request.args.get('zipcode', 0, type=int)
-    # print("Search by zipcode: ", zip)
 
     error = None
     if not zip:
@@ -54,12 +53,17 @@ def search():
     if error is not None:
         flash(error)
     elif cached_zip_result is not None:
+        # unpacked_result = r.get(zip)
+        print(1)
+        # print(unpacked_result)
+        # return jsonify(unpacked_result)
         apartments = r.get(zip)
         cacheresult = apartments.decode('utf8').replace("'", '"')
         cacheresult_re = re.sub('"created".*?\),', '', cacheresult)
+        print('cache result: ', cacheresult_re)
         return cacheresult_re
     else:
-        # print(2)
+        print(2)
         cursor.execute(
             'SELECT *'
             ' FROM apartment'
@@ -82,7 +86,11 @@ def search():
             #     item['sqft'] = apt['sqft']
             #     result.append(item)
             # return jsonify(result)
+            print('apartments')
+            print(apartments)
             json_result = jsonify(apartments)
+            print('json_result')
+            print(json_result)
             r.set(zip, apartments)
             r.expire(zip, 100)
             # return json_result

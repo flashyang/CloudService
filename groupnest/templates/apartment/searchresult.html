@@ -12,13 +12,14 @@
         $.getJSON($SCRIPT_ROOT + '/apartment/search', {
           zipcode: $('input[name="zipcode"]').val(),
         }, function(data) {
-          $("#result").html('<tr><th>Nest</th><th>Name</th><th>Bedroom</th><th>Bathroom</th><th>Address</th></tr>');
+          $("#result").html('<tr><th>Nest</th><th>Name</th><th>Bedroom</th><th>Bathroom</th><th>Price</th><th>Address</th></tr>');
           $.each(data, function(index, apartment) {
             var local_url = $SCRIPT_ROOT + '/nest/' + apartment.apartment_id + '/associatedNests'
             $('#result').append('<tr><td>' + "<a href='" + local_url + "'>nest</a></td><td>"
                 + apartment.name + '</td><td>' 
                 + apartment.room_number + '</td><td>' 
                 + apartment.bathroom_number + '</td><td>'
+                + apartment.price + '</td><td>'
                 + apartment.street_address + ', ' + apartment.city + ', ' + apartment.state + ', ' + apartment.zip + '</td></tr>');
 				  });
         });

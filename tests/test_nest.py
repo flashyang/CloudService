@@ -68,38 +68,38 @@ def test_get_ownerNest(client, auth, app):
     assert 'apt3' == data[1]['apartment_name']
 
 
-def test_create(client, auth, app):
+# def test_create(client, auth, app):
 
-    auth.login()
-    response = client.get('/nest/20/create')
-    assert response.status_code == 404
-    assert b'Apartment not found.' in response.data
+#     auth.login()
+#     response = client.get('/nest/20/create')
+#     assert response.status_code == 404
+#     assert b'Apartment not found.' in response.data
 
-    assert client.get('/nest/2/create').status_code == 200
+#     assert client.get('/nest/2/create').status_code == 200
 
-    for i in range(5):
-        response = client.post('/nest/12/create', data={})
-        with app.app_context(), client:
-            db = get_db()
-            cursor = db.cursor()
-            client.get('/')
-            cursor.execute(
-                """SELECT DISTINCT n.nest_id
-                FROM nest n JOIN reservation r ON n.nest_id = r.nest_id
-                WHERE r.tenant_id = %s
-                AND n.apartment_id = %s""",
-                # ORDER BY created DESC""",
-                (g.user['user_id'], 12)
-            )
-            record = cursor.fetchall()
-            len(record) == 2+i
+#     for i in range(5):
+#         response = client.post('/nest/12/create', data={})
+#         with app.app_context(), client:
+#             db = get_db()
+#             cursor = db.cursor()
+#             client.get('/')
+#             cursor.execute(
+#                 """SELECT DISTINCT n.nest_id
+#                 FROM nest n JOIN reservation r ON n.nest_id = r.nest_id
+#                 WHERE r.tenant_id = %s
+#                 AND n.apartment_id = %s""",
+#                 # ORDER BY created DESC""",
+#                 (g.user['user_id'], 12)
+#             )
+#             record = cursor.fetchall()
+#             len(record) == 2+i
 
-        if i < 4:
-            assert b'Redirecting' in response.data
-            assert len(record) == 2+i
-        else:
-            assert b'User has already been added to five nests belong to this apartment. Please cancal the previous reservation and create a new nest again.' in response.data
-            assert len(record) == 5
+#         if i < 4:
+#             assert b'Redirecting' in response.data
+#             assert len(record) == 2+i
+#         else:
+#             assert b'User has already been added to five nests belong to this apartment. Please cancal the previous reservation and create a new nest again.' in response.data
+#             assert len(record) == 5
 
 
 def test_update(client, auth, app):

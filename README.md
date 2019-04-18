@@ -2,13 +2,13 @@
 
 · Language(s): Front end is HTML Ajax + Backend is Python Flask
 
-· Development and production web server:  Flask build-in and NGINX with Gunicorn
+· Development web server:  NGINX and Gunicorn
 
-· Testing frameworks: unittest module built in to the Python standard library. 
+· Testing frameworks: unit test module built in to the Python standard library coverrage 85%+. 
 
-· Persistent Storage: mySQL (ClearDB)
+· Persistent Storage: mySQL (ClearDB deployed on Heroku)
 
-· Caching: Redis
+· Caching: Redis (deployed on EC2)
 
 · API technology: REST (For the external API we also used the Google auth and we successfully implement it 
    in our loacl host. However, when we deploy it to EC2 instance there a lot of network and bugs we can't fix. 

@@ -1,4 +1,4 @@
-# CloudService (Team SocialPig)
+# Groupnest (Team SocialPig)
 
 · Language(s): Front end is HTML Ajax + Backend is Python Flask
 
@@ -10,7 +10,9 @@
 
 · Caching: Redis
 
-· API technology: REST
+· API technology: REST (For the external API we also used the Google auth and we successfully implement it 
+   in our loacl host. However, when we deploy it to EC2 instance there a lot of network and bugs we can't fix. 
+   So we make a trade off, we decide to deploy the app and give up Google auth, you can find the code related to Google auth in released tag with version1).
 
 · Pipline: Jenkins
 
@@ -19,6 +21,7 @@
 # Additional Url
 
 · Host: http://ec2-3-85-103-162.compute-1.amazonaws.com
+
 · Pipeline: built in Jenkins instance http://129.10.111.230:8080/
 
 # Set up clearDB (MySQL database) on Heroku

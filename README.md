@@ -12,7 +12,7 @@
 
 · API technology: REST (For the external API we also used the Google auth and we successfully implement it 
    in our loacl host. However, when we deploy it to EC2 instance there a lot of network and bugs we can't fix. 
-   So we make a trade off, we decide to deploy the app and give up Google auth, you can find the code related to Google auth in released tag with version1).
+   So we make a trade off, we decide to deploy the app and give up Google auth, you can find the code related to Google auth in released tag with 1.0).
 
 · Pipline: Jenkins
 

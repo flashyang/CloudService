@@ -24,29 +24,6 @@
 
 · Pipeline: built in Jenkins instance http://129.10.111.230:8080/
 
-# Set up clearDB (MySQL database) on Heroku
-```shell
-brew install heroku/brew/heroku
-
-heroku login
-
-heroku create
-
-heroku addons:create cleardb:ignite -a quiet-inlet-97604
-
-heroku config -a quiet-inlet-97604 | grep CLEARDB_DATABASE_URL
-
-pip install PyMySQL
-
-
-testing database:
-
-heroku addons:create cleardb:ignite -a fast-reaches-11674
-
-heroku config -a fast-reaches-11674 | grep CLEARDB_DATABASE_URL
-```
-
-
 
 # Command Line for running:
 Flask activate the vitual environment:
@@ -68,12 +45,6 @@ export DATABASE_URL=mysql://b4fda20e6f61ef:f9356ca7@us-cdbr-iron-east-03.cleardb
 
 export TEST_DATABASE_URL=mysql://b51ab60be50de0:b0ddd521@us-cdbr-iron-east-03.cleardb.net/heroku_36faaceaabbea7e
 
-flask init-db
-
 flask run
-
-
-git pull origin yangsun
-
 
 
